@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from openarm_control.config import ArmSetup, register_common_args, setup_from_args
-from openarm_control.kinematics import (
+"""Kinematics and control utilities for OpenArm."""
+
+from .config import ArmSetup, register_common_args, setup_from_args
+from .kinematics import (
     IKParams,
     Kinematics,
     register_ik_args,
     ik_params_from_args,
 )
-from openarm_control.poses import read_ee_pose, pose_to_se3, se3_to_pose
+from .poses import read_ee_pose, pose_to_se3, se3_to_pose
 
 __all__ = [
     # context

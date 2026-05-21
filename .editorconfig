@@ -12,34 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+root = true
 
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
-*.egg
-.eggs/
+[*.sh]
 
-# Editable installs / uv
-.venv/
-venv/
-.uv/
-
-# Test / coverage
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
-.mypy_cache/
-.ruff_cache/
-
-# Editor / OS
-.vscode/
-.idea/
-*.swp
-.DS_Store
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true

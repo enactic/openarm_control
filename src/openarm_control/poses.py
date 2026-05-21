@@ -51,7 +51,7 @@ def pose_to_se3(pose: np.ndarray):  # -> mink.SE3
 
     wxyz_xyz = np.empty(7, dtype=np.float64)
     wxyz_xyz[:4] = pose[3:7]  # quat: wxyz
-    wxyz_xyz[4:] = pose[:3]   # translation: xyz
+    wxyz_xyz[4:] = pose[:3]  # translation: xyz
     return mink.SE3(wxyz_xyz=wxyz_xyz)
 
 

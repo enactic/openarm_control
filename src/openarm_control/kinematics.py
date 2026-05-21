@@ -65,6 +65,7 @@ class Kinematics:
     """
 
     def __init__(self, setup: ArmSetup, ik_params: IKParams | None = None) -> None:
+        """Initialize."""
         self.setup = setup
         self._ik: _IKSolver | None = (
             _IKSolver(setup, ik_params) if ik_params is not None else None
@@ -98,7 +99,7 @@ class Kinematics:
         self._require_ik().sync(values16)
 
     def ready(self) -> bool:
-        """True once all active arms have received at least one target this cycle."""
+        """Return True once all active arms have received at least one target this cycle."""
         return self._require_ik().ready()
 
     def solve(self) -> np.ndarray | None:
@@ -117,6 +118,7 @@ class Kinematics:
 
 
 # ── internal IK implementation ────────────────────────────────────────────────
+
 
 class _IKSolver:
     """mink QP-based differential IK. Managed by Kinematics; not public API."""
@@ -147,10 +149,9 @@ class _IKSolver:
             for side in setup.sides
         }
 
-        active_qpos: set[int] = (
-            set(setup.joint_resolver._right.arm_qpos.tolist())
-            | set(setup.joint_resolver._left.arm_qpos.tolist())
-        )
+        active_qpos: set[int] = set(
+            setup.joint_resolver._right.arm_qpos.tolist()
+        ) | set(setup.joint_resolver._left.arm_qpos.tolist())
         freeze_dofs = [
             int(setup.model.jnt_dofadr[j])
             for j in range(setup.model.njnt)
@@ -160,7 +161,8 @@ class _IKSolver:
         print(freeze_dofs)
         self._freeze_task: mink.DofFreezingTask | None = (
             mink.DofFreezingTask(model=setup.model, dof_indices=freeze_dofs)
-            if freeze_dofs else None
+            if freeze_dofs
+            else None
         )
 
         self._limits = [mink.ConfigurationLimit(setup.model)]
@@ -202,19 +204,31 @@ class _IKSolver:
         for _ in range(self._max_iters):
             try:
                 vel = mink.solve_ik(
-                    self._config, tasks, self._dt, self._solver_name,
-                    limits=self._limits, constraints=constraints,
-                    safety_break=False, **self._solver_params,
+                    self._config,
+                    tasks,
+                    self._dt,
+                    self._solver_name,
+                    limits=self._limits,
+                    constraints=constraints,
+                    safety_break=False,
+                    **self._solver_params,
                 )
             except mink.exceptions.NoSolutionFound:
                 try:
                     vel = mink.solve_ik(
-                        self._config, tasks, self._dt, self._solver_name,
-                        limits=[], constraints=constraints,
-                        safety_break=False, **self._solver_params,
+                        self._config,
+                        tasks,
+                        self._dt,
+                        self._solver_name,
+                        limits=[],
+                        constraints=constraints,
+                        safety_break=False,
+                        **self._solver_params,
                     )
                 except mink.exceptions.NoSolutionFound:
-                    print("Warning: IK solver failed (constrained and unconstrained). Skipping step.")
+                    print(
+                        "Warning: IK solver failed (constrained and unconstrained). Skipping step."
+                    )
                     return None
             self._config.integrate_inplace(vel, self._dt)
 
@@ -223,10 +237,12 @@ class _IKSolver:
         qpos = self._config.data.qpos
         right_joints, _ = self._joint_resolver.get_driver(qpos, "right")
         left_joints, _ = self._joint_resolver.get_driver(qpos, "left")
-        return np.concatenate([
-            np.append(right_joints, self._gripper[0]),
-            np.append(left_joints,  self._gripper[1]),
-        ]).astype(np.float32)
+        return np.concatenate(
+            [
+                np.append(right_joints, self._gripper[0]),
+                np.append(left_joints, self._gripper[1]),
+            ]
+        ).astype(np.float32)
 
 
 def _frame_name(setup: ArmSetup, side: str) -> str:
@@ -239,6 +255,7 @@ def _frame_name(setup: ArmSetup, side: str) -> str:
     }[ftype]
     return mujoco.mj_id2name(setup.model, obj, fid)
 
+
 def _convert_velocity(
     rad_per_sec: float,
     dt: float,
@@ -249,21 +266,67 @@ def _convert_velocity(
         raise ValueError("max_iters, dt, and tick_hz must all be positive.")
     return rad_per_sec / (max_iters * dt * tick_hz)
 
+
 # ── CLI helpers ───────────────────────────────────────────────────────────────
+
 
 def register_ik_args(parser: argparse.ArgumentParser) -> None:
     """Register IK-specific CLI flags. Call after register_common_args."""
-    parser.add_argument("--pos-cost",     type=float, default=1.0,   help="Position task cost (default: 1.0)")
-    parser.add_argument("--ori-cost",     type=float, default=1.0,   help="Orientation task cost (default: 1.0)")
-    parser.add_argument("--lm-damping",   type=float, default=0.01,  help="Per-task LM damping (default: 0.01)")
-    parser.add_argument("--damping",      type=float, default=0.25,  help="Global Tikhonov regularization (default: 0.25)")
-    parser.add_argument("--solver",       default="daqp",            help="QP backend (default: daqp)")
-    parser.add_argument("--max-iters",    type=int,   default=5,     help="IK iterations per event (default: 5)")
-    parser.add_argument("--dt",           type=float, default=0.1,   help="Integration timestep per iteration (default: 0.1)")
-    parser.add_argument("--posture-cost", type=float, default=0.01,  help="Posture task weight, 0=disabled (default: 0.01)")
-    parser.add_argument("--diag-reg",     type=float, default=0.0,   help="QP diagonal regularization (default: 0.0)")
-    parser.add_argument("--vel-scale",    type=float, default=None,  help="Scale velocity limit safety. 1=90deg/s for shoulder. Unset = VelocityLimit disabled.")
-    parser.add_argument("--tick-hz",      type=float, default=500.0, help="Dora tick rate in Hz; used only for --vel-scale unit conversion")
+    parser.add_argument(
+        "--pos-cost", type=float, default=1.0, help="Position task cost (default: 1.0)"
+    )
+    parser.add_argument(
+        "--ori-cost",
+        type=float,
+        default=1.0,
+        help="Orientation task cost (default: 1.0)",
+    )
+    parser.add_argument(
+        "--lm-damping",
+        type=float,
+        default=0.01,
+        help="Per-task LM damping (default: 0.01)",
+    )
+    parser.add_argument(
+        "--damping",
+        type=float,
+        default=0.25,
+        help="Global Tikhonov regularization (default: 0.25)",
+    )
+    parser.add_argument("--solver", default="daqp", help="QP backend (default: daqp)")
+    parser.add_argument(
+        "--max-iters", type=int, default=5, help="IK iterations per event (default: 5)"
+    )
+    parser.add_argument(
+        "--dt",
+        type=float,
+        default=0.1,
+        help="Integration timestep per iteration (default: 0.1)",
+    )
+    parser.add_argument(
+        "--posture-cost",
+        type=float,
+        default=0.01,
+        help="Posture task weight, 0=disabled (default: 0.01)",
+    )
+    parser.add_argument(
+        "--diag-reg",
+        type=float,
+        default=0.0,
+        help="QP diagonal regularization (default: 0.0)",
+    )
+    parser.add_argument(
+        "--vel-scale",
+        type=float,
+        default=None,
+        help="Scale velocity limit safety. 1=90deg/s for shoulder. Unset = VelocityLimit disabled.",
+    )
+    parser.add_argument(
+        "--tick-hz",
+        type=float,
+        default=500.0,
+        help="Dora tick rate in Hz; used only for --vel-scale unit conversion",
+    )
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:

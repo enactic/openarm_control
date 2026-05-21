@@ -1,4 +1,4 @@
-# openarm_control
+# OpenArm Control
 
 Reusable kinematics and control utilities for OpenArm, backed by MuJoCo and [mink](https://github.com/kevinzakka/mink).
 
@@ -11,7 +11,6 @@ uv sync
 ## Usage
 
 ### `Kinematics`
-
 
 ```python
 from openarm_control import Kinematics, IKParams, ArmSetup
@@ -45,3 +44,18 @@ Solver configuration passed to `Kinematics`. All fields have defaults.
 | `max_iters` | `5` | IK iterations per solve |
 
 Build from CLI args with `register_ik_args` + `ik_params_from_args`:
+
+## Related links
+
+- 💬 Join the community on [Discord](https://discord.gg/FsZaZ4z3We)
+- 📬 Contact us through <openarm@enactic.ai>
+
+## License
+
+Licensed under the Apache License 2.0. See [LICENSE.txt](LICENSE.txt) for details.
+
+Copyright 2026 Enactic, Inc.
+
+## Code of Conduct
+
+All participation in the OpenArm project is governed by our [Code of Conduct](CODE_OF_CONDUCT.md).

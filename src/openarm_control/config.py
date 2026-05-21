@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 
 import mujoco
+import numpy as np
 import openarm_mujoco_v2 as openarm_mujoco
 from openarm_mujoco_v2 import JointResolver
 
@@ -66,11 +67,12 @@ class ArmSetup:
         frame_ids: dict[str, int],
         frame_types: dict[str, str],
     ) -> None:
+        """Initialize."""
         self.model = model
         self.data = data
         self.joint_resolver = joint_resolver
         self.sides = sides
-        self.frame_ids = frame_ids      # side → MuJoCo object ID
+        self.frame_ids = frame_ids  # side → MuJoCo object ID
         self.frame_types = frame_types  # side → "body" | "site" | "geom"
 
     @classmethod
@@ -84,6 +86,7 @@ class ArmSetup:
         frame_type_left: str,
         keyframe: str | None = "home",
     ) -> ArmSetup:
+        """Build from XML."""
         model = mujoco.MjModel.from_xml_path(xml)
         data = mujoco.MjData(model)
 
@@ -119,9 +122,10 @@ class ArmSetup:
             frame_types=frame_types,
         )
 
-    def read_ee_pose(self, side: str) -> "np.ndarray":
+    def read_ee_pose(self, side: str) -> np.ndarray:
         """Return float32[7] = [px, py, pz, qw, qx, qy, qz] for the given arm."""
         from openarm_control.poses import read_ee_pose
+
         return read_ee_pose(self.data, self.frame_ids[side], self.frame_types[side])
 
 
@@ -143,7 +147,8 @@ def register_common_args(parser: argparse.ArgumentParser) -> None:
         help=f"MJCF scene file (default: {_DEFAULT_XML})",
     )
     parser.add_argument(
-        "--keyframe", "-k",
+        "--keyframe",
+        "-k",
         default="home",
         help="Initial keyframe name (default: home)",
     )

@@ -17,11 +17,14 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "openarm-control"
+name = "openarm_control"
 version = "0.1.0"
 description = "Kinematics and control utilities for OpenArm"
+authors = [{name = "Enactic, Inc."}]
+license = {text = "Apache-2.0"}
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
+
 dependencies = [
     "daqp==0.7.2",
     "mink>=1.1.0",
@@ -30,11 +33,25 @@ dependencies = [
     "openarm-mujoco",
 ]
 
+[project.urls]
+Changelog = "https://github.com/enactic/openarm_control/releases"
+Issues = "https://github.com/enactic/openarm_control/issues"
+Repository = "https://github.com/enactic/openarm_control.git"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff.lint]
+extend-select = [
+  "D",   # pydocstyle
+  "UP",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"!src/**.py" = ["D"]
 
 [tool.uv.sources]
 openarm-mujoco = { git = "https://github.com/enactic/openarm_mujoco.git", subdirectory = "v2", rev = "cba9759f7245ae3925f91c6600bdccc130cbf4e3" }
