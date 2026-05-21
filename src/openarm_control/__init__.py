@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from openarm_control.collision import categorize_geoms, geom_pairs_for_arms
 from openarm_control.config import ArmSetup, register_common_args, setup_from_args
 from openarm_control.kinematics import (
     IKParams,
@@ -36,4 +37,7 @@ __all__ = [
     "read_ee_pose",
     "pose_to_se3",
     "se3_to_pose",
+    # collision helpers
+    "categorize_geoms",
+    "geom_pairs_for_arms",
 ]

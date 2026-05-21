@@ -37,6 +37,7 @@ import mink.exceptions
 import mujoco
 import numpy as np
 
+from openarm_control.collision import geom_pairs_for_arms
 from openarm_control.config import ArmSetup
 from openarm_control.poses import pose_to_se3
 
@@ -54,6 +55,12 @@ class IKParams:
     diag_reg: float = 0.0
     dt: float = 0.1
     max_iters: int = 5
+
+    # Safety limits
+    avoid_collisions: bool = False
+    collision_margin: float = 0.005       # meters
+    collision_sensor: float = 0.02        # meters
+    v_max: float | None = None            # rad/dt
 
 
 class Kinematics:
@@ -164,6 +171,30 @@ class _IKSolver:
 
         self._limits = [mink.ConfigurationLimit(setup.model)]
 
+        # Add velocity limit
+        if params.v_max is not None:
+            velocities: dict[str, float] = {}
+            for j in range(setup.model.njnt):
+                jname = setup.model.joint(j).name
+                if jname and setup.model.jnt_type[j] != mujoco.mjtJoint.mjJNT_FREE:
+                    velocities[jname] = float(params.v_max)
+            self._limits.append(mink.VelocityLimit(setup.model, velocities))
+
+        # Add collision avoidance limit
+        self._collision_limit: mink.Limit | None = None
+        if params.avoid_collisions:
+            pairs = geom_pairs_for_arms(setup.model)
+            if pairs:
+                self._collision_limit = mink.CollisionAvoidanceLimit(
+                    model=setup.model,
+                    geom_pairs=pairs,
+                    minimum_distance_from_collisions=params.collision_margin,
+                    collision_detection_distance=params.collision_sensor,
+                )
+                self._limits.append(self._collision_limit)
+            else:
+                print("Warning: avoid_collisions set but no arm/env geom pairs found; collision avoidance disabled.")
+
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
         self._posture_task.set_target(mid_qpos)
 
@@ -195,6 +226,11 @@ class _IKSolver:
             tasks.append(self._posture_task)
         constraints = [self._freeze_task] if self._freeze_task else []
 
+        # Maintain collision avoidance during fallback calculation
+        fallback_limits: list = (
+            [self._collision_limit] if self._collision_limit is not None else []
+        )
+
         for _ in range(self._max_iters):
             try:
                 vel = mink.solve_ik(
@@ -206,11 +242,11 @@ class _IKSolver:
                 try:
                     vel = mink.solve_ik(
                         self._config, tasks, self._dt, self._solver_name,
-                        limits=[], constraints=constraints,
+                        limits=fallback_limits, constraints=constraints,
                         safety_break=False, **self._solver_params,
                     )
                 except mink.exceptions.NoSolutionFound:
-                    print("Warning: IK solver failed (constrained and unconstrained). Skipping step.")
+                    print("Warning: IK solver failed (both constrained and fallback passes). Skipping step.")
                     return None
             self._config.integrate_inplace(vel, self._dt)
 
@@ -249,6 +285,10 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--dt",           type=float, default=0.1,   help="Integration timestep per iteration (default: 0.1)")
     parser.add_argument("--posture-cost", type=float, default=0.01,  help="Posture task weight, 0=disabled (default: 0.01)")
     parser.add_argument("--diag-reg",     type=float, default=0.0,   help="QP diagonal regularization (default: 0.0)")
+    parser.add_argument("--avoid-collisions", action="store_true",       help="Enable mink CollisionAvoidanceLimit (CBF) inside the IK QP")
+    parser.add_argument("--collision-margin", type=float, default=0.005, help="CollisionAvoidanceLimit minimum clearance in meters (default: 0.005)")
+    parser.add_argument("--collision-sensor", type=float, default=0.02,  help="CBF detection band in meters; must exceed --collision-margin (default: 0.02)")
+    parser.add_argument("--v-max",            type=float, default=None,  help="Uniform per-joint velocity cap in rad/dt. Unset = VelocityLimit disabled.")
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:
@@ -263,4 +303,8 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         diag_reg=args.diag_reg,
         dt=args.dt,
         max_iters=args.max_iters,
+        avoid_collisions=args.avoid_collisions,
+        collision_margin=args.collision_margin,
+        collision_sensor=args.collision_sensor,
+        v_max=args.v_max,
     )
