@@ -129,6 +129,7 @@ class _IKSolver:
         self._max_iters = params.max_iters
 
         self._config = mink.Configuration(setup.model)
+        self._config.update(q=setup.data.qpos.copy())
         mid_qpos = self._config.data.qpos.copy()
 
         task_kwargs = dict(
