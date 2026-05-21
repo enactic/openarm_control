@@ -240,6 +240,7 @@ class _IKSolver:
                 )
             except mink.exceptions.NoSolutionFound:
                 try:
+                    print("Warning: IK solver failed fully constrained solution. Trying fallback conditions (collision only).")
                     vel = mink.solve_ik(
                         self._config, tasks, self._dt, self._solver_name,
                         limits=fallback_limits, constraints=constraints,
