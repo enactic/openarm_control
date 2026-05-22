@@ -55,6 +55,8 @@ class IKParams:
     dt: float = 0.1
     max_iters: int = 5
 
+    # Safety limits
+    v_max: float | None = None            # rad/dt
 
 class Kinematics:
     """Unified FK + IK for OpenArm, backed by MuJoCo + mink.
@@ -164,6 +166,15 @@ class _IKSolver:
 
         self._limits = [mink.ConfigurationLimit(setup.model)]
 
+        # Add velocity limit
+        if params.v_max is not None:
+            velocities: dict[str, float] = {}
+            for j in range(setup.model.njnt):
+                jname = setup.model.joint(j).name
+                if jname and setup.model.jnt_type[j] != mujoco.mjtJoint.mjJNT_FREE:
+                    velocities[jname] = float(params.v_max)
+            self._limits.append(mink.VelocityLimit(setup.model, velocities))
+
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
         self._posture_task.set_target(mid_qpos)
 
@@ -249,6 +260,7 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--dt",           type=float, default=0.1,   help="Integration timestep per iteration (default: 0.1)")
     parser.add_argument("--posture-cost", type=float, default=0.01,  help="Posture task weight, 0=disabled (default: 0.01)")
     parser.add_argument("--diag-reg",     type=float, default=0.0,   help="QP diagonal regularization (default: 0.0)")
+    parser.add_argument("--v-max",            type=float, default=None,  help="Uniform per-joint velocity cap in rad/dt. Unset = VelocityLimit disabled.")
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:
@@ -263,4 +275,5 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         diag_reg=args.diag_reg,
         dt=args.dt,
         max_iters=args.max_iters,
+        v_max=args.v_max,
     )
