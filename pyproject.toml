@@ -37,4 +37,4 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.uv.sources]
-openarm-mujoco = { git = "https://github.com/enactic/openarm_mujoco.git", subdirectory = "v2" }
+openarm-mujoco = { git = "https://github.com/enactic/openarm_mujoco" }
