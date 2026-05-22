@@ -56,7 +56,7 @@ class IKParams:
     max_iters: int = 5
 
     # Safety limits
-    v_max: float | None = None            # rad/dt
+    v_max: float | None = None            # rad/s
 
 class Kinematics:
     """Unified FK + IK for OpenArm, backed by MuJoCo + mink.
@@ -246,6 +246,15 @@ def _frame_name(setup: ArmSetup, side: str) -> str:
     }[ftype]
     return mujoco.mj_id2name(setup.model, obj, fid)
 
+def _convert_velocity(
+    rad_per_sec: float,
+    dt: float,
+    max_iters: int,
+    tick_hz: float,
+) -> float:
+    if max_iters <= 0 or dt <= 0.0 or tick_hz <= 0.0:
+        raise ValueError("max_iters, dt, and tick_hz must all be positive.")
+    return rad_per_sec / (max_iters * dt * tick_hz)
 
 # ── CLI helpers ───────────────────────────────────────────────────────────────
 
@@ -260,11 +269,21 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--dt",           type=float, default=0.1,   help="Integration timestep per iteration (default: 0.1)")
     parser.add_argument("--posture-cost", type=float, default=0.01,  help="Posture task weight, 0=disabled (default: 0.01)")
     parser.add_argument("--diag-reg",     type=float, default=0.0,   help="QP diagonal regularization (default: 0.0)")
-    parser.add_argument("--v-max",            type=float, default=None,  help="Uniform per-joint velocity cap in rad/dt. Unset = VelocityLimit disabled.")
+    parser.add_argument("--v-max",        type=float, default=None,  help="Uniform per-joint velocity cap in wall-clock rad/s. Unset = VelocityLimit disabled.")
+    parser.add_argument("--tick-hz",      type=float, default=250.0, help="Dora tick rate in Hz; used only for --v-max conversion")
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:
     """Build IKParams from parsed args (requires register_ik_args to have been called)."""
+    v_max_mink: float | None = None
+    if args.v_max is not None:
+        v_max_mink = _convert_velocity(
+            rad_per_sec=args.v_max,
+            dt=args.dt,
+            max_iters=args.max_iters,
+            tick_hz=args.tick_hz,
+        )
+
     return IKParams(
         position_cost=args.pos_cost,
         orientation_cost=args.ori_cost,
@@ -275,5 +294,5 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         diag_reg=args.diag_reg,
         dt=args.dt,
         max_iters=args.max_iters,
-        v_max=args.v_max,
+        v_max=v_max_mink,
     )
