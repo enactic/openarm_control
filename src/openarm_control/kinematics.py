@@ -37,7 +37,7 @@ import mink.exceptions
 import mujoco
 import numpy as np
 
-from openarm_control.config import ArmSetup
+from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
 from openarm_control.poses import pose_to_se3
 
 
@@ -54,9 +54,8 @@ class IKParams:
     diag_reg: float = 0.0
     dt: float = 0.1
     max_iters: int = 5
+    velocity_limits: dict[str, float] | None = None
 
-    # Safety limits
-    v_max: float | None = None            # rad/s
 
 class Kinematics:
     """Unified FK + IK for OpenArm, backed by MuJoCo + mink.
@@ -166,14 +165,8 @@ class _IKSolver:
 
         self._limits = [mink.ConfigurationLimit(setup.model)]
 
-        # Add velocity limit
-        if params.v_max is not None:
-            velocities: dict[str, float] = {}
-            for j in range(setup.model.njnt):
-                jname = setup.model.joint(j).name
-                if jname and setup.model.jnt_type[j] != mujoco.mjtJoint.mjJNT_FREE:
-                    velocities[jname] = float(params.v_max)
-            self._limits.append(mink.VelocityLimit(setup.model, velocities))
+        if params.velocity_limits is not None:
+            self._limits.append(mink.VelocityLimit(setup.model, params.velocity_limits))
 
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
         self._posture_task.set_target(mid_qpos)
@@ -269,20 +262,24 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--dt",           type=float, default=0.1,   help="Integration timestep per iteration (default: 0.1)")
     parser.add_argument("--posture-cost", type=float, default=0.01,  help="Posture task weight, 0=disabled (default: 0.01)")
     parser.add_argument("--diag-reg",     type=float, default=0.0,   help="QP diagonal regularization (default: 0.0)")
-    parser.add_argument("--v-max",        type=float, default=None,  help="Uniform per-joint velocity cap in wall-clock rad/s. Unset = VelocityLimit disabled.")
-    parser.add_argument("--tick-hz",      type=float, default=250.0, help="Dora tick rate in Hz; used only for --v-max conversion")
+    parser.add_argument("--vel-scale",    type=float, default=None,  help="Scale velocity limit safety. 1=90deg/s for shoulder. Unset = VelocityLimit disabled.")
+    parser.add_argument("--tick-hz",      type=float, default=500.0, help="Dora tick rate in Hz; used only for --vel-scale unit conversion")
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:
     """Build IKParams from parsed args (requires register_ik_args to have been called)."""
-    v_max_mink: float | None = None
-    if args.v_max is not None:
-        v_max_mink = _convert_velocity(
-            rad_per_sec=args.v_max,
-            dt=args.dt,
-            max_iters=args.max_iters,
-            tick_hz=args.tick_hz,
-        )
+    velocity_limits: dict[str, float] | None = None
+    if args.vel_scale is not None:
+        velocity_limits = {
+            f"openarm_{side}_joint{i + 1}": _convert_velocity(
+                rad_per_sec=v * args.vel_scale,
+                dt=args.dt,
+                max_iters=args.max_iters,
+                tick_hz=args.tick_hz,
+            )
+            for side in ("left", "right")
+            for i, v in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+        }
 
     return IKParams(
         position_cost=args.pos_cost,
@@ -294,5 +291,5 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         diag_reg=args.diag_reg,
         dt=args.dt,
         max_iters=args.max_iters,
-        v_max=v_max_mink,
+        velocity_limits=velocity_limits,
     )

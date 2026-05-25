@@ -35,6 +35,17 @@ _FRAME_OBJ = {
     "geom": mujoco.mjtObj.mjOBJ_GEOM,
 }
 
+# Per-arm-joint velocity caps in rad/s at --vel-scale=1.0
+ARM_JOINT_VELOCITY_LIMITS_RAD_S: list[float] = [
+    1.57,  # joint1 DM 8009
+    1.57,  # joint2 DM 8009
+    3.14,  # joint3 DM 4340
+    3.14,  # joint4 DM 4340
+    12.6,  # joint5 DM 4310
+    12.6,  # joint6 DM 4310
+    12.6,  # joint7 DM 4310
+]
+
 
 class ArmSetup:
     """MuJoCo context shared across FK, IK, and controller nodes.
