@@ -42,6 +42,7 @@ Solver configuration passed to `Kinematics`. All fields have defaults.
 | `diag_reg` | `0.0` | QP diagonal regularization |
 | `dt` | `0.1` | Integration timestep per iteration |
 | `max_iters` | `5` | IK iterations per solve |
+| `velocity_limits` | `None` | Per-joint velocity limits (applied in rad/s from `config.py`); `None` = disabled |
 
 Build from CLI args with `register_ik_args` + `ik_params_from_args`:
 
