@@ -36,9 +36,6 @@ _FRAME_OBJ = {
     "geom": mujoco.mjtObj.mjOBJ_GEOM,
 }
 
-# Dora tick rate in Hz; used to convert the rad/s caps below into per-iteration limits.
-TICK_HZ: float = 500.0
-
 # Per-arm-joint velocity caps in rad/s. Enabled via --limit-velocity.
 ARM_JOINT_VELOCITY_LIMITS_RAD_S: list[float] = [
     1.57,  # joint1 DM 8009

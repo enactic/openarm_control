@@ -37,7 +37,7 @@ import mink.exceptions
 import mujoco
 import numpy as np
 
-from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, TICK_HZ, ArmSetup
+from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
 from openarm_control.poses import pose_to_se3
 
 
@@ -320,6 +320,12 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         action="store_true",
         help="Enable per-joint velocity limits (caps in config.ARM_JOINT_VELOCITY_LIMITS_RAD_S).",
     )
+    parser.add_argument(
+        "--tick-hz",
+        type=float,
+        default=500.0,
+        help="Dora tick rate in Hz; must match the dataflow timer (default: 500.0).",
+    )
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:
@@ -331,7 +337,7 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
                 rad_per_sec=v,
                 dt=args.dt,
                 max_iters=args.max_iters,
-                tick_hz=TICK_HZ,
+                tick_hz=args.tick_hz,
             )
             for side in ("left", "right")
             for i, v in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
