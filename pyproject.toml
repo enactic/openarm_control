@@ -52,6 +52,3 @@ extend-select = [
 
 [tool.ruff.lint.per-file-ignores]
 "!src/**.py" = ["D"]
-
-[tool.uv.sources]
-openarm-mujoco = { git = "https://github.com/enactic/openarm_mujoco.git" }
