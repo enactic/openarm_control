@@ -31,6 +31,7 @@ dependencies = [
     "mujoco>=3.6.0",
     "numpy",
     "openarm-mujoco",
+    "pyyaml",
 ]
 
 [project.urls]

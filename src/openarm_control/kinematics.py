@@ -30,12 +30,14 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import pathlib
 from dataclasses import dataclass
 
 import mink
 import mink.exceptions
 import mujoco
 import numpy as np
+import yaml
 
 from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
 from openarm_control.poses import pose_to_se3
@@ -267,6 +269,33 @@ def _convert_velocity(
     return rad_per_sec / (max_iters * dt * tick_hz)
 
 
+def _load_velocity_caps(config_path: pathlib.Path | None) -> list[float]:
+    """Return per-joint velocity caps in rad/s.
+
+    With no config path, returns the built-in ARM_JOINT_VELOCITY_LIMITS_RAD_S. When a
+    path is given, reads the top-level 'arm_velocity_limits' list from the YAML and uses
+    it instead; the library stays config-format-agnostic beyond that single key.
+    """
+    if config_path is None:
+        return ARM_JOINT_VELOCITY_LIMITS_RAD_S
+
+    with open(config_path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    if not isinstance(data, dict) or "arm_velocity_limits" not in data:
+        raise ValueError(
+            f"Config file {config_path} has no top-level 'arm_velocity_limits' list."
+        )
+
+    caps = [float(v) for v in data["arm_velocity_limits"]]
+    expected = len(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+    if len(caps) != expected:
+        raise ValueError(
+            f"arm_velocity_limits in {config_path} has {len(caps)} entries; "
+            f"expected {expected}."
+        )
+    return caps
+
+
 # ── CLI helpers ───────────────────────────────────────────────────────────────
 
 
@@ -321,6 +350,15 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         help="Enable per-joint velocity limits (caps in config.ARM_JOINT_VELOCITY_LIMITS_RAD_S).",
     )
     parser.add_argument(
+        "--config",
+        type=pathlib.Path,
+        default=None,
+        help=(
+            "YAML file with a top-level 'arm_velocity_limits: [rad/s, ...]' list that "
+            "overrides the built-in per-joint caps. Used only with --limit-velocity."
+        ),
+    )
+    parser.add_argument(
         "--tick-hz",
         type=float,
         default=500.0,
@@ -332,6 +370,7 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
     """Build IKParams from parsed args (requires register_ik_args to have been called)."""
     velocity_limits: dict[str, float] | None = None
     if args.limit_velocity:
+        caps = _load_velocity_caps(getattr(args, "config", None))
         velocity_limits = {
             f"openarm_{side}_joint{i + 1}": _convert_velocity(
                 rad_per_sec=v,
@@ -340,7 +379,7 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
                 tick_hz=args.tick_hz,
             )
             for side in ("left", "right")
-            for i, v in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+            for i, v in enumerate(caps)
         }
 
     return IKParams(
