@@ -21,10 +21,10 @@ Usage:
     pose_r, pose_l = kin.fk_bimanual(r, l)  # single mj_forward
 
     # FK + IK
-    kin = Kinematics(setup, IKParams())
+    kin = Kinematics(setup, IKParams(dt=0.1, max_iters=5))
     kin.set_target("right", pose)
     kin.set_target("left", pose)
-    result = kin.solve(dt=0.1, n_iters=5)   # float32[16] or None
+    result = kin.solve()                    # float32[16] or None
 """
 
 from __future__ import annotations
