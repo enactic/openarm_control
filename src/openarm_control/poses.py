@@ -14,7 +14,9 @@
 
 """Pose conversion utilities shared across FK, IK, and controller nodes.
 
-Convention: float32[7] = [px, py, pz, qw, qx, qy, qz]
+Convention: float32[7] = [px, py, pz, qw, qx, qy, qz]. API-level poses are
+expressed relative to the setup's origin frame (see config.ArmSetup);
+helpers here operate on whatever frame their inputs are in.
 """
 
 from __future__ import annotations
@@ -40,6 +42,23 @@ def read_ee_pose(data: mujoco.MjData, fid: int, ftype: str) -> np.ndarray:
         quat = np.empty(4)
         mujoco.mju_mat2Quat(quat, data.geom_xmat[fid])
     return np.concatenate([pos, quat]).astype(np.float32)
+
+
+def relative_pose(origin: np.ndarray, target: np.ndarray) -> np.ndarray:
+    """Express a world-frame target pose in the frame of a world-frame origin pose.
+
+    Computes T_origin^-1 * T_target. Both inputs and the result are
+    float32[7] = [px, py, pz, qw, qx, qy, qz].
+    """
+    origin = np.asarray(origin, dtype=np.float64)
+    target = np.asarray(target, dtype=np.float64)
+    inv_quat = np.empty(4)
+    mujoco.mju_negQuat(inv_quat, origin[3:7])
+    rel_pos = np.empty(3)
+    mujoco.mju_rotVecQuat(rel_pos, target[:3] - origin[:3], inv_quat)
+    rel_quat = np.empty(4)
+    mujoco.mju_mulQuat(rel_quat, inv_quat, target[3:7])
+    return np.concatenate([rel_pos, rel_quat]).astype(np.float32)
 
 
 def pose_to_se3(pose: np.ndarray):  # -> mink.SE3

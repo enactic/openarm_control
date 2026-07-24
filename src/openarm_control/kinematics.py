@@ -14,6 +14,11 @@
 
 """High-level FK + IK interface for OpenArm.
 
+Poses are float32[7] = [px, py, pz, qw, qx, qy, qz], expressed in the
+setup's origin frame (default: the scene's 'arm_origin' site; pass
+--origin-frame world for world coordinates). FK returns poses in that
+frame and IK targets are interpreted in it.
+
 Usage:
     # FK only
     kin = Kinematics(setup)
@@ -93,7 +98,10 @@ class Kinematics:
     # ── IK ───────────────────────────────────────────────────────────────────
 
     def set_target(self, side: str, pose: np.ndarray) -> None:
-        """Set EE target for one arm. pose: float32[7] = [px, py, pz, qw, qx, qy, qz]."""
+        """Set EE target for one arm, in the origin frame.
+
+        pose: float32[7] = [px, py, pz, qw, qx, qy, qz].
+        """
         self._require_ik().set_target(side, pose)
 
     def sync(self, values16: np.ndarray) -> None:
@@ -142,14 +150,27 @@ class _IKSolver:
             orientation_cost=params.orientation_cost,
             lm_damping=params.lm_damping,
         )
-        self._tasks: dict[str, mink.FrameTask] = {
-            side: mink.FrameTask(
-                frame_name=_frame_name(setup, side),
-                frame_type=setup.frame_types[side],
-                **task_kwargs,
-            )
-            for side in setup.sides
-        }
+        self._tasks: dict[str, mink.FrameTask | mink.RelativeFrameTask]
+        if setup.origin_id is not None:
+            self._tasks = {
+                side: mink.RelativeFrameTask(
+                    frame_name=_frame_name(setup, side),
+                    frame_type=setup.frame_types[side],
+                    root_name=setup.origin_name,
+                    root_type=setup.origin_type,
+                    **task_kwargs,
+                )
+                for side in setup.sides
+            }
+        else:
+            self._tasks = {
+                side: mink.FrameTask(
+                    frame_name=_frame_name(setup, side),
+                    frame_type=setup.frame_types[side],
+                    **task_kwargs,
+                )
+                for side in setup.sides
+            }
 
         active_qpos: set[int] = set(
             setup.joint_resolver._right.arm_qpos.tolist()
@@ -159,8 +180,6 @@ class _IKSolver:
             for j in range(setup.model.njnt)
             if setup.model.jnt_qposadr[j] not in active_qpos
         ]
-        print(active_qpos)
-        print(freeze_dofs)
         self._freeze_task: mink.DofFreezingTask | None = (
             mink.DofFreezingTask(model=setup.model, dof_indices=freeze_dofs)
             if freeze_dofs

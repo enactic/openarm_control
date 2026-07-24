@@ -30,6 +30,12 @@ _DEFAULT_FRAME_TYPE_RIGHT = "site"
 _DEFAULT_FRAME_LEFT = "left_ee_control_point"
 _DEFAULT_FRAME_TYPE_LEFT = "site"
 
+_DEFAULT_ORIGIN_FRAME = "arm_origin"
+_DEFAULT_ORIGIN_FRAME_TYPE = "site"
+
+# Sentinel --origin-frame value: no origin frame, poses stay world-relative.
+WORLD_FRAME = "world"
+
 _FRAME_OBJ = {
     "body": mujoco.mjtObj.mjOBJ_BODY,
     "site": mujoco.mjtObj.mjOBJ_SITE,
@@ -55,7 +61,9 @@ class ArmSetup:
     EE frame IDs/types. Instantiate once per process; pass into any solver
     or controller that needs model access.
 
-    Pose convention throughout: float32[7] = [px, py, pz, qw, qx, qy, qz]
+    Pose convention throughout: float32[7] = [px, py, pz, qw, qx, qy, qz],
+    expressed in the origin frame when one is set (default: the scene's
+    'arm_origin' site), else in world coordinates.
     """
 
     def __init__(
@@ -66,6 +74,8 @@ class ArmSetup:
         sides: list[str],
         frame_ids: dict[str, int],
         frame_types: dict[str, str],
+        origin_name: str = WORLD_FRAME,
+        origin_type: str = "site",
     ) -> None:
         """Initialize."""
         self.model = model
@@ -74,6 +84,13 @@ class ArmSetup:
         self.sides = sides
         self.frame_ids = frame_ids  # side → MuJoCo object ID
         self.frame_types = frame_types  # side → "body" | "site" | "geom"
+        self.origin_name = origin_name
+        self.origin_type = origin_type
+        self.origin_id = (
+            None
+            if origin_name == WORLD_FRAME
+            else _resolve_frame_id(model, origin_name, origin_type)
+        )
 
     @classmethod
     def from_args(
@@ -85,6 +102,8 @@ class ArmSetup:
         frame_left: str,
         frame_type_left: str,
         keyframe: str | None = "home",
+        origin_frame: str = _DEFAULT_ORIGIN_FRAME,
+        origin_frame_type: str = _DEFAULT_ORIGIN_FRAME_TYPE,
     ) -> ArmSetup:
         """Build from XML."""
         model = mujoco.MjModel.from_xml_path(xml)
@@ -120,13 +139,23 @@ class ArmSetup:
             sides=sides,
             frame_ids=frame_ids,
             frame_types=frame_types,
+            origin_name=origin_frame,
+            origin_type=origin_frame_type,
         )
 
     def read_ee_pose(self, side: str) -> np.ndarray:
-        """Return float32[7] = [px, py, pz, qw, qx, qy, qz] for the given arm."""
-        from openarm_control.poses import read_ee_pose
+        """Return float32[7] = [px, py, pz, qw, qx, qy, qz] for the given arm.
 
-        return read_ee_pose(self.data, self.frame_ids[side], self.frame_types[side])
+        Expressed in the origin frame when one is set, else in world
+        coordinates.
+        """
+        from openarm_control.poses import read_ee_pose, relative_pose
+
+        pose = read_ee_pose(self.data, self.frame_ids[side], self.frame_types[side])
+        if self.origin_id is None:
+            return pose
+        origin = read_ee_pose(self.data, self.origin_id, self.origin_type)
+        return relative_pose(origin, pose)
 
 
 def _resolve_frame_id(model: mujoco.MjModel, name: str, ftype: str) -> int:
@@ -180,6 +209,21 @@ def register_common_args(parser: argparse.ArgumentParser) -> None:
         default=_DEFAULT_FRAME_TYPE_LEFT,
         help="EE frame type for left arm (default: site)",
     )
+    parser.add_argument(
+        "--origin-frame",
+        default=_DEFAULT_ORIGIN_FRAME,
+        help=(
+            "Frame whose pose is the origin of all FK/IK poses "
+            f"(default: {_DEFAULT_ORIGIN_FRAME}). "
+            f"Pass '{WORLD_FRAME}' for raw world-frame poses."
+        ),
+    )
+    parser.add_argument(
+        "--origin-frame-type",
+        choices=["body", "site", "geom"],
+        default=_DEFAULT_ORIGIN_FRAME_TYPE,
+        help="Origin frame type (default: site)",
+    )
 
 
 def setup_from_args(args: argparse.Namespace) -> ArmSetup:
@@ -192,4 +236,6 @@ def setup_from_args(args: argparse.Namespace) -> ArmSetup:
         frame_left=args.frame_left,
         frame_type_left=args.frame_type_left,
         keyframe=args.keyframe,
+        origin_frame=args.origin_frame,
+        origin_frame_type=args.origin_frame_type,
     )
