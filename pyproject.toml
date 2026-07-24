@@ -34,6 +34,9 @@ dependencies = [
     "pyyaml",
 ]
 
+[tool.uv.sources]
+openarm-mujoco = { git = "https://github.com/k1000dai/openarm_mujoco", branch = "arm_origin" }
+
 [project.urls]
 Changelog = "https://github.com/enactic/openarm_control/releases"
 Issues = "https://github.com/enactic/openarm_control/issues"
