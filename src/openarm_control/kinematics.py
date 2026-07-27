@@ -44,7 +44,11 @@ import mujoco
 import numpy as np
 import yaml
 
-from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
+from openarm_control.config import (
+    ARM_JOINT_VELOCITY_LIMITS_RAD_S,
+    ArmSetup,
+    frame_name,
+)
 from openarm_control.poses import pose_to_se3
 
 
@@ -156,7 +160,9 @@ class _IKSolver:
                 side: mink.RelativeFrameTask(
                     frame_name=_frame_name(setup, side),
                     frame_type=setup.frame_types[side],
-                    root_name=setup.origin_name,
+                    root_name=frame_name(
+                        setup.model, setup.origin_id, setup.origin_type
+                    ),
                     root_type=setup.origin_type,
                     **task_kwargs,
                 )
@@ -267,14 +273,7 @@ class _IKSolver:
 
 
 def _frame_name(setup: ArmSetup, side: str) -> str:
-    ftype = setup.frame_types[side]
-    fid = setup.frame_ids[side]
-    obj = {
-        "body": mujoco.mjtObj.mjOBJ_BODY,
-        "site": mujoco.mjtObj.mjOBJ_SITE,
-        "geom": mujoco.mjtObj.mjOBJ_GEOM,
-    }[ftype]
-    return mujoco.mj_id2name(setup.model, obj, fid)
+    return frame_name(setup.model, setup.frame_ids[side], setup.frame_types[side])
 
 
 def _convert_velocity(

@@ -74,7 +74,6 @@ class ArmSetup:
         sides: list[str],
         frame_ids: dict[str, int],
         frame_types: dict[str, str],
-        origin_name: str = WORLD_FRAME,
         origin_id: int | None = None,
         origin_type: str = "site",
     ) -> None:
@@ -85,9 +84,8 @@ class ArmSetup:
         self.sides = sides
         self.frame_ids = frame_ids  # side → MuJoCo object ID
         self.frame_types = frame_types  # side → "body" | "site" | "geom"
-        self.origin_name = origin_name
         self.origin_type = origin_type
-        self.origin_id = origin_id
+        self.origin_id = origin_id  # None → poses stay world-relative
 
     @classmethod
     def from_args(
@@ -141,7 +139,6 @@ class ArmSetup:
             sides=sides,
             frame_ids=frame_ids,
             frame_types=frame_types,
-            origin_name=origin_frame,
             origin_id=origin_id,
             origin_type=origin_frame_type,
         )
@@ -162,13 +159,27 @@ class ArmSetup:
 
 
 def _resolve_frame_id(model: mujoco.MjModel, name: str, ftype: str) -> int:
-    obj = _FRAME_OBJ.get(ftype)
-    if obj is None:
-        raise ValueError(f"Unknown frame_type '{ftype}'. Expected body/site/geom.")
+    obj = _frame_obj(ftype)
     fid = mujoco.mj_name2id(model, obj, name)
     if fid < 0:
         raise ValueError(f"{ftype.capitalize()} '{name}' not found in model.")
     return fid
+
+
+def frame_name(model: mujoco.MjModel, fid: int, ftype: str) -> str:
+    """Return the model name of a frame, given its MuJoCo object ID and type.
+
+    Frame IDs are what MjData is indexed by, so they are what ArmSetup
+    stores; name-based APIs (mink tasks) go through here.
+    """
+    return mujoco.mj_id2name(model, _frame_obj(ftype), fid)
+
+
+def _frame_obj(ftype: str) -> mujoco.mjtObj:
+    obj = _FRAME_OBJ.get(ftype)
+    if obj is None:
+        raise ValueError(f"Unknown frame_type '{ftype}'. Expected body/site/geom.")
+    return obj
 
 
 def register_common_args(parser: argparse.ArgumentParser) -> None:
