@@ -75,6 +75,7 @@ class ArmSetup:
         frame_ids: dict[str, int],
         frame_types: dict[str, str],
         origin_name: str = WORLD_FRAME,
+        origin_id: int | None = None,
         origin_type: str = "site",
     ) -> None:
         """Initialize."""
@@ -86,11 +87,7 @@ class ArmSetup:
         self.frame_types = frame_types  # side → "body" | "site" | "geom"
         self.origin_name = origin_name
         self.origin_type = origin_type
-        self.origin_id = (
-            None
-            if origin_name == WORLD_FRAME
-            else _resolve_frame_id(model, origin_name, origin_type)
-        )
+        self.origin_id = origin_id
 
     @classmethod
     def from_args(
@@ -132,6 +129,11 @@ class ArmSetup:
             frame_ids[side] = _resolve_frame_id(model, name, ftype)
             frame_types[side] = ftype
 
+        origin_id = (
+            None
+            if origin_frame == WORLD_FRAME
+            else _resolve_frame_id(model, origin_frame, origin_frame_type)
+        )
         return cls(
             model=model,
             data=data,
@@ -140,6 +142,7 @@ class ArmSetup:
             frame_ids=frame_ids,
             frame_types=frame_types,
             origin_name=origin_frame,
+            origin_id=origin_id,
             origin_type=origin_frame_type,
         )
 
