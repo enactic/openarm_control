@@ -50,8 +50,6 @@ def relative_pose(origin: np.ndarray, target: np.ndarray) -> np.ndarray:
     Computes T_origin^-1 * T_target. Both inputs and the result are
     float32[7] = [px, py, pz, qw, qx, qy, qz].
     """
-    origin = np.asarray(origin, dtype=np.float64)
-    target = np.asarray(target, dtype=np.float64)
     inv_quat = np.empty(4)
     mujoco.mju_negQuat(inv_quat, origin[3:7])
     rel_pos = np.empty(3)
