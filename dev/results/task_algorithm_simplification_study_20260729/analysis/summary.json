@@ -1,0 +1,28 @@
+{
+  "finite_metrics": true,
+  "run_counts": {
+    "nullspace": 162,
+    "error": 108,
+    "braking": 64,
+    "braking_robustness": 80,
+    "boundary": 160,
+    "boundary_robustness": 120
+  },
+  "total_dynamic_and_boundary_runs": 694,
+  "solver_failures": 0,
+  "nullspace_equivalence": {
+    "samples": 10000,
+    "dt_sub_s": 0.0008,
+    "return_rate_s_inv": 1.6,
+    "equivalent_direct_gain": 0.00128,
+    "max_abs_H_difference": 0.0,
+    "max_abs_c_difference": 2.7755575615628914e-17,
+    "max_reference_displacement_rad": 0.0025082636876803143,
+    "interpretation": "Without speed clipping, direct angle error with gain=k*dt_sub is exactly the same QP objective as the current rate target."
+  },
+  "key_results": {
+    "direct_nullspace": "gain=k*dt is exactly the rate-only objective; gain=1 cannot be retuned with one cost to match tracking, acceleration, and branch metrics simultaneously",
+    "fixed_error_clip": "instant 0.6->0.9 m/s with latch dominates unconditional fixed 3/6/9/12 mm clipping across tracking and tail metrics",
+    "distance_only_braking": "measured-position-only braking at 0.6 rad preserved or increased all tested target-joint margins, including the lagged plant"
+  }
+}

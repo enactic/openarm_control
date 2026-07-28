@@ -1,0 +1,734 @@
+{
+  "revision": "b0765391420948f0e8ed026c6e30f0b77b5ea3ff",
+  "study_revision": "a524600873c30ba2",
+  "generated_at": "2026-07-29T00:33:13+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "current",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "no_joint_braking_current_tasks",
+      "overrides": {
+        "joint_limit_braking": false
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "no_velocity_current_tasks",
+      "overrides": {
+        "joint_limit_braking": false
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "no_velocity",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "unlimited_reference",
+      "overrides": {
+        "joint_limit_braking": false,
+        "singularity_approach_limit": false
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "no_velocity",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "velocity_scale_1p25_current_tasks",
+      "overrides": {},
+      "velocity_caps": [
+        2.5,
+        2.5,
+        3.9250000000000003,
+        3.9250000000000003,
+        15.75,
+        15.75,
+        15.75
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "j1_cap_2p5",
+      "overrides": {},
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "j1_cap_3p0",
+      "overrides": {},
+      "velocity_caps": [
+        3.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "j1_cap_4p0",
+      "overrides": {},
+      "velocity_caps": [
+        4.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "j1_j4_caps_2p5_3p8",
+      "overrides": {},
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.8,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "j1_cap_2p5_no_braking",
+      "overrides": {
+        "joint_limit_braking": false
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_0p10",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.1
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "description": ""
+    },
+    {
+      "name": "brake_per_joint_compact",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": [
+        0.25,
+        0.12,
+        0.25,
+        0.5,
+        0.2,
+        0.15,
+        0.2
+      ],
+      "description": ""
+    },
+    {
+      "name": "candidate_compact",
+      "overrides": {
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "kinetic_energy_cost": 0.0001
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": [
+        0.25,
+        0.12,
+        0.25,
+        0.5,
+        0.2,
+        0.15,
+        0.2
+      ],
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "retract_diag_m0p10_v0p10",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.1,
+      "sample_count": 1249,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_m0p10_v0p40",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 490,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_m0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_p0p10_v0p10",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.1,
+      "sample_count": 1249,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_p0p10_v0p40",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 490,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_p0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p00_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 926,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p00_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 644,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_m0p10_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 956,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p10_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 956,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_circle_right_v0p15",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.15,
+      "sample_count": 659,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_circle_right_v0p40",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 364,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_circle_right_v0p80",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 276,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_wrist_right_w6p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 6.0,
+      "sample_count": 487,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_wrist_right_w10p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 367,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "normal_right_v0p50",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.5,
+      "sample_count": 783,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "normal_right_v0p80",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 560,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    }
+  ]
+}

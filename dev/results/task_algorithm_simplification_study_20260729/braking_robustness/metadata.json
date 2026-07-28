@@ -1,0 +1,511 @@
+{
+  "revision": "b0765391420948f0e8ed026c6e30f0b77b5ea3ff",
+  "study_revision": "4c938b51b973f78f",
+  "generated_at": "2026-07-29T02:19:41+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "current__nominal",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_only_0p6__nominal",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.6,
+        "joint_limit_braking_reaction_time": 0.0,
+        "joint_limit_braking_distance_buffer": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_only_0p7__nominal",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.7,
+        "joint_limit_braking_reaction_time": 0.0,
+        "joint_limit_braking_distance_buffer": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_only_0p8__nominal",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.8,
+        "joint_limit_braking_reaction_time": 0.0,
+        "joint_limit_braking_distance_buffer": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_only_0p9__nominal",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.9,
+        "joint_limit_braking_reaction_time": 0.0,
+        "joint_limit_braking_distance_buffer": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "current__lagged",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.024,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_only_0p6__lagged",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.6,
+        "joint_limit_braking_reaction_time": 0.0,
+        "joint_limit_braking_distance_buffer": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.024,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_only_0p7__lagged",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.7,
+        "joint_limit_braking_reaction_time": 0.0,
+        "joint_limit_braking_distance_buffer": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.024,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_only_0p8__lagged",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.8,
+        "joint_limit_braking_reaction_time": 0.0,
+        "joint_limit_braking_distance_buffer": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.024,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_only_0p9__lagged",
+      "overrides": {
+        "joint_limit_braking_slowdown_distance": 0.9,
+        "joint_limit_braking_reaction_time": 0.0,
+        "joint_limit_braking_distance_buffer": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.024,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "reach_right_p0p00_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 926,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p00_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 644,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_m0p10_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 660,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p10_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 660,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_m0p10_v0p40",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 490,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_m0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_circle_right_v0p80",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 276,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "normal_right_v0p80",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 560,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    }
+  ]
+}

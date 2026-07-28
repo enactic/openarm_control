@@ -1,0 +1,12 @@
+{
+  "standard": {
+    "cases": 196,
+    "feasible": 128,
+    "correct_recovery_direction": 128
+  },
+  "recoverable": {
+    "cases": 196,
+    "feasible": 196,
+    "correct_recovery_direction": 196
+  }
+}

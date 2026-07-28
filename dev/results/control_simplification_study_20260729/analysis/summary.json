@@ -1,0 +1,72 @@
+{
+  "finite_metrics": true,
+  "parameter_surface": {
+    "added_count": 27,
+    "current_count": 37,
+    "current_fields": [
+      "position_cost",
+      "orientation_cost",
+      "frame_position_error_limit",
+      "frame_orientation_error_limit",
+      "frame_error_limit_linear_slow",
+      "frame_error_limit_linear_fast",
+      "frame_error_limit_activation_rise_rate",
+      "frame_error_limit_activation_fall_rate",
+      "lm_damping",
+      "damping",
+      "solver",
+      "posture_cost",
+      "diag_reg",
+      "dt",
+      "max_iters",
+      "velocity_limits",
+      "joint_limit_recovery_velocity_scale",
+      "nullspace_cost",
+      "nullspace_return_rate",
+      "nullspace_max_speed",
+      "nullspace_singularity_low",
+      "nullspace_singularity_high",
+      "nullspace_characteristic_length",
+      "joint_limit_braking",
+      "joint_limit_braking_slowdown_distance",
+      "joint_limit_braking_exponent",
+      "joint_limit_braking_guard_margin",
+      "joint_limit_braking_reaction_time",
+      "joint_limit_braking_distance_buffer",
+      "singularity_approach_limit",
+      "singularity_ratio_stop",
+      "singularity_ratio_slow",
+      "singularity_max_approach_rate",
+      "singularity_braking_exponent",
+      "singularity_gradient_epsilon",
+      "measured_state_timeout",
+      "kinetic_energy_cost"
+    ],
+    "main_count": 10,
+    "main_fields": [
+      "position_cost",
+      "orientation_cost",
+      "lm_damping",
+      "damping",
+      "solver",
+      "posture_cost",
+      "diag_reg",
+      "dt",
+      "max_iters",
+      "velocity_limits"
+    ]
+  },
+  "row_counts": {
+    "boundary": 140,
+    "components": 380,
+    "retune": 342,
+    "robustness": 228,
+    "total": 1090
+  },
+  "solver_failures": {
+    "boundary": 0,
+    "components": 0,
+    "retune": 0,
+    "robustness": 0
+  }
+}

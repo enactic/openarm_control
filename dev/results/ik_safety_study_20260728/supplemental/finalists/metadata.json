@@ -1,0 +1,1171 @@
+{
+  "revision": "b0765391420948f0e8ed026c6e30f0b77b5ea3ff",
+  "study_revision": "2fe7fc6508c01761",
+  "generated_at": "2026-07-29T01:13:46+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "current__nominal",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "current__cmd24ms",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "current__actuator0p7",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "current__cmd24ms_actuator0p7",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "compact__nominal",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "compact__cmd24ms",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "compact__actuator0p7",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "compact__cmd24ms_actuator0p7",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "current_ori2__nominal",
+      "overrides": {
+        "orientation_cost": 2.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "current_ori2__cmd24ms",
+      "overrides": {
+        "orientation_cost": 2.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "current_ori2__actuator0p7",
+      "overrides": {
+        "orientation_cost": 2.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "current_ori2__cmd24ms_actuator0p7",
+      "overrides": {
+        "orientation_cost": 2.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "compact_ori2__nominal",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "orientation_cost": 2.0
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "compact_ori2__cmd24ms",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "orientation_cost": 2.0
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "compact_ori2__actuator0p7",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "orientation_cost": 2.0
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "compact_ori2__cmd24ms_actuator0p7",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "orientation_cost": 2.0
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "compact_ori2_damping1__nominal",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "orientation_cost": 2.0,
+        "damping": 1.0
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "compact_ori2_damping1__cmd24ms",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "orientation_cost": 2.0,
+        "damping": 1.0
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "compact_ori2_damping1__actuator0p7",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "orientation_cost": 2.0,
+        "damping": 1.0
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "compact_ori2_damping1__cmd24ms_actuator0p7",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08,
+        "orientation_cost": 2.0,
+        "damping": 1.0
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "lower_task_ori2__nominal",
+      "overrides": {
+        "position_cost": 5.0,
+        "orientation_cost": 2.0,
+        "kinetic_energy_cost": 5e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "lower_task_ori2__cmd24ms",
+      "overrides": {
+        "position_cost": 5.0,
+        "orientation_cost": 2.0,
+        "kinetic_energy_cost": 5e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "lower_task_ori2__actuator0p7",
+      "overrides": {
+        "position_cost": 5.0,
+        "orientation_cost": 2.0,
+        "kinetic_energy_cost": 5e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    },
+    {
+      "name": "lower_task_ori2__cmd24ms_actuator0p7",
+      "overrides": {
+        "position_cost": 5.0,
+        "orientation_cost": 2.0,
+        "kinetic_energy_cost": 5e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.024,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 0.7,
+      "actuator_kv_scale": 0.7,
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "reach_right_p0p00_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 926,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_m0p10_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 660,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_m0p10_v0p40",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 490,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_p0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_circle_right_v0p80",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 276,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_wrist_right_w10p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 367,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "normal_wrist_right_w10p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 370,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "normal_bimanual_v0p60",
+      "family": "normal_workspace",
+      "mode": "bimanual",
+      "speed": 0.6,
+      "sample_count": 684,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_normal_right_seed0_v0p35",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.35,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_normal_bimanual_seed101_v0p7",
+      "family": "randomized",
+      "mode": "bimanual",
+      "speed": 0.7,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_extended_right_seed200_v0p3",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.3,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "random_extended_right_seed203_v0p3",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.3,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "intervention_187_right_shoulder_elbow",
+      "family": "intervention_replay",
+      "mode": "right",
+      "speed": 5.709053217289845,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 187 right shoulder_elbow command window at 123.00s.",
+      "initial_right": [
+        1.2571319288950364,
+        0.2515882539869511,
+        -0.20981127769590832,
+        0.6084096006282539,
+        -0.1321849975638332,
+        0.3235583366643145,
+        0.4950634692082317
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "intervention_187_right_wrist",
+      "family": "intervention_replay",
+      "mode": "right",
+      "speed": 15.65574861269392,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 187 right wrist command window at 53.73s.",
+      "initial_right": [
+        0.31400225308048296,
+        0.5497610704567851,
+        -0.2262701462603004,
+        2.0300762412919986,
+        1.0127139794049358,
+        0.7853999733924866,
+        0.7205695410685157
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "intervention_187_left_shoulder_elbow",
+      "family": "intervention_replay",
+      "mode": "left",
+      "speed": 4.118024354301919,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 187 left shoulder_elbow command window at 89.17s.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        -0.3155628441515282,
+        -0.600707486549956,
+        0.2536602102853829,
+        1.879063495827146,
+        0.22757739816052483,
+        0.341150554639715,
+        -0.7595586026006047
+      ]
+    },
+    {
+      "name": "intervention_187_left_wrist",
+      "family": "intervention_replay",
+      "mode": "left",
+      "speed": 15.079268063350442,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 187 left wrist command window at 134.18s.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        -0.09936637990155732,
+        -0.47527534942028826,
+        0.19714044018395235,
+        1.9168544863469552,
+        -0.028743267975777746,
+        -0.7503600498393511,
+        -0.8009922532407664
+      ]
+    }
+  ]
+}

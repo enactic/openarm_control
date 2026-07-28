@@ -1,0 +1,338 @@
+{
+  "revision": "b0765391420948f0e8ed026c6e30f0b77b5ea3ff",
+  "study_revision": "2fe7fc6508c01761",
+  "generated_at": "2026-07-29T01:08:47+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "current",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "compact_candidate",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "no_error_limit",
+      "overrides": {
+        "frame_position_error_limit": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "minimal_safety",
+      "overrides": {
+        "nullspace_cost": 0.0,
+        "singularity_approach_limit": false,
+        "joint_limit_braking": false,
+        "frame_position_error_limit": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "intervention_187_right_shoulder_elbow",
+      "family": "intervention_replay",
+      "mode": "right",
+      "speed": 5.709053217289845,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 187 right shoulder_elbow command window at 123.00s.",
+      "initial_right": [
+        1.2571319288950364,
+        0.2515882539869511,
+        -0.20981127769590832,
+        0.6084096006282539,
+        -0.1321849975638332,
+        0.3235583366643145,
+        0.4950634692082317
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "intervention_187_right_wrist",
+      "family": "intervention_replay",
+      "mode": "right",
+      "speed": 15.65574861269392,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 187 right wrist command window at 53.73s.",
+      "initial_right": [
+        0.31400225308048296,
+        0.5497610704567851,
+        -0.2262701462603004,
+        2.0300762412919986,
+        1.0127139794049358,
+        0.7853999733924866,
+        0.7205695410685157
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "intervention_187_left_shoulder_elbow",
+      "family": "intervention_replay",
+      "mode": "left",
+      "speed": 4.118024354301919,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 187 left shoulder_elbow command window at 89.17s.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        -0.3155628441515282,
+        -0.600707486549956,
+        0.2536602102853829,
+        1.879063495827146,
+        0.22757739816052483,
+        0.341150554639715,
+        -0.7595586026006047
+      ]
+    },
+    {
+      "name": "intervention_187_left_wrist",
+      "family": "intervention_replay",
+      "mode": "left",
+      "speed": 15.079268063350442,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 187 left wrist command window at 134.18s.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        -0.09936637990155732,
+        -0.47527534942028826,
+        0.19714044018395235,
+        1.9168544863469552,
+        -0.028743267975777746,
+        -0.7503600498393511,
+        -0.8009922532407664
+      ]
+    },
+    {
+      "name": "intervention_189_right_shoulder_elbow",
+      "family": "intervention_replay",
+      "mode": "right",
+      "speed": 4.449370252764317,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 189 right shoulder_elbow command window at 418.81s.",
+      "initial_right": [
+        1.2839560541279107,
+        0.2564169516226331,
+        0.0064859487226818354,
+        0.1625659092492198,
+        -0.07183300725012584,
+        0.2661666725536139,
+        -0.04416356865289504
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "intervention_189_right_wrist",
+      "family": "intervention_replay",
+      "mode": "right",
+      "speed": 5.506136856309713,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 189 right wrist command window at 304.24s.",
+      "initial_right": [
+        0.7253902247284214,
+        0.3908689226960804,
+        0.21985429994971345,
+        1.3819387848624365,
+        0.8981848985307993,
+        0.7853999733924866,
+        -0.047359939838426644
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "intervention_189_left_shoulder_elbow",
+      "family": "intervention_replay",
+      "mode": "left",
+      "speed": 4.152566273083136,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 189 left shoulder_elbow command window at 457.40s.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        -1.1847188943258125,
+        -0.22719183457680509,
+        -0.10228727089697187,
+        0.0825409472949826,
+        -0.05261918799355164,
+        0.1881449747722873,
+        -0.7177590166472576
+      ]
+    },
+    {
+      "name": "intervention_189_left_wrist",
+      "family": "intervention_replay",
+      "mode": "left",
+      "speed": 3.9972023545272877,
+      "sample_count": 837,
+      "description": "FK reconstruction of episode 189 left wrist command window at 292.02s.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        -0.43882792218555866,
+        -0.39001945125416104,
+        -0.23825144515053262,
+        1.5133050055925366,
+        -0.22756494778029923,
+        0.7853999733924866,
+        -0.9446391343851019
+      ]
+    }
+  ]
+}

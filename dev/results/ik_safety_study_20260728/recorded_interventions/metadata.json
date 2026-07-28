@@ -1,0 +1,14 @@
+{
+  "record_root": "/hdd_data/rollout/pillow_0702_history_with_visual_from_flatten_hist_base_30k_0711_window_20_80k/dataset/episodes",
+  "episodes": [
+    187,
+    188,
+    189,
+    194,
+    196,
+    198
+  ],
+  "sample_dt": 0.004,
+  "lag_search_max_s": 0.24,
+  "savgol_window": 21
+}

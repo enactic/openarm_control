@@ -1,0 +1,522 @@
+{
+  "revision": "b0765391420948f0e8ed026c6e30f0b77b5ea3ff",
+  "study_revision": "2fe7fc6508c01761",
+  "generated_at": "2026-07-29T01:07:46+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "current",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "compact_candidate",
+      "overrides": {
+        "kinetic_energy_cost": 5e-05,
+        "frame_error_limit_linear_slow": 0.6,
+        "frame_error_limit_linear_fast": 0.9,
+        "frame_error_limit_activation_rise_rate": 1000000.0,
+        "frame_error_limit_activation_fall_rate": 1000000.0,
+        "nullspace_singularity_high": 0.08
+      },
+      "velocity_caps": [
+        2.5,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "no_nullspace",
+      "overrides": {
+        "nullspace_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "no_singularity_limit",
+      "overrides": {
+        "singularity_approach_limit": false
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "no_joint_braking",
+      "overrides": {
+        "joint_limit_braking": false
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "no_error_limit",
+      "overrides": {
+        "frame_position_error_limit": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "no_energy",
+      "overrides": {
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "random_normal_right_seed0_v0p35",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.35,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_normal_right_seed100_v0p7",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.7,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_extended_right_seed200_v0p3",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.3,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "random_normal_right_seed1_v0p35",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.35,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_normal_bimanual_seed101_v0p7",
+      "family": "randomized",
+      "mode": "bimanual",
+      "speed": 0.7,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_extended_right_seed201_v0p3",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.3,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "random_normal_right_seed2_v0p35",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.35,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_normal_right_seed102_v0p7",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.7,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_extended_right_seed202_v0p3",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.3,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "random_normal_right_seed3_v0p35",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.35,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_normal_bimanual_seed103_v0p7",
+      "family": "randomized",
+      "mode": "bimanual",
+      "speed": 0.7,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "random_extended_right_seed203_v0p3",
+      "family": "randomized",
+      "mode": "right",
+      "speed": 0.3,
+      "sample_count": 1162,
+      "description": "Seeded smooth Cartesian motion with simultaneous orientation.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}

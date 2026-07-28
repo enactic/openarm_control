@@ -1,0 +1,19 @@
+{
+  "control_dt_s": 0.004,
+  "max_iters": 5,
+  "substep_dt_s": 0.0008,
+  "gain": 0.95,
+  "recovery_scale": 1.0,
+  "sample_count": 224,
+  "standard_infeasible_count": 96,
+  "recoverable_infeasible_count": 0,
+  "standard_max_recoverable_overshoot_rad": {
+    "joint1": 0.0016842105263157896,
+    "joint2": 0.0016842105263157896,
+    "joint3": 0.00264421052631579,
+    "joint4": 0.00264421052631579,
+    "joint5": 0.010610526315789475,
+    "joint6": 0.010610526315789475,
+    "joint7": 0.010610526315789475
+  }
+}

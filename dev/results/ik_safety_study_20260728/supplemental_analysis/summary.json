@@ -1,0 +1,50 @@
+{
+  "base_qp": {
+    "rows": 374,
+    "profiles": 34,
+    "scenarios": 10,
+    "solver_failures": 0
+  },
+  "interactions": {
+    "rows": 288,
+    "profiles": 32,
+    "scenarios": 8,
+    "solver_failures": 0
+  },
+  "joint_limits": {
+    "rows": 112,
+    "profiles": 8,
+    "scenarios": 14,
+    "solver_failures": 0
+  },
+  "braking_dynamics": {
+    "rows": 420,
+    "profiles": 21,
+    "scenarios": 20,
+    "solver_failures": 0
+  },
+  "randomized": {
+    "rows": 98,
+    "profiles": 7,
+    "scenarios": 12,
+    "solver_failures": 0
+  },
+  "robustness": {
+    "rows": 160,
+    "profiles": 20,
+    "scenarios": 7,
+    "solver_failures": 0
+  },
+  "replay": {
+    "rows": 32,
+    "profiles": 4,
+    "scenarios": 8,
+    "solver_failures": 0
+  },
+  "finalists": {
+    "rows": 432,
+    "profiles": 24,
+    "scenarios": 16,
+    "solver_failures": 0
+  }
+}

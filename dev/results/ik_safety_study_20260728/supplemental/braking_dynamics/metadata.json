@@ -1,0 +1,1120 @@
+{
+  "revision": "b0765391420948f0e8ed026c6e30f0b77b5ea3ff",
+  "study_revision": "2fe7fc6508c01761",
+  "generated_at": "2026-07-29T01:26:29+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "current",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "no_braking",
+      "overrides": {
+        "joint_limit_braking": false
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "gravity_compensation",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": true,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "guard_0p05_gravity_compensation",
+      "overrides": {
+        "joint_limit_braking_guard_margin": 0.05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": true,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "reaction_0p08",
+      "overrides": {
+        "joint_limit_braking_reaction_time": 0.08
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "reaction_0p12",
+      "overrides": {
+        "joint_limit_braking_reaction_time": 0.12
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "reaction_0p16",
+      "overrides": {
+        "joint_limit_braking_reaction_time": 0.16
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "reaction_0p2",
+      "overrides": {
+        "joint_limit_braking_reaction_time": 0.2
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "buffer_0p03",
+      "overrides": {
+        "joint_limit_braking_distance_buffer": 0.03
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "buffer_0p05",
+      "overrides": {
+        "joint_limit_braking_distance_buffer": 0.05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "buffer_0p08",
+      "overrides": {
+        "joint_limit_braking_distance_buffer": 0.08
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "buffer_0p12",
+      "overrides": {
+        "joint_limit_braking_distance_buffer": 0.12
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "guard_0p03",
+      "overrides": {
+        "joint_limit_braking_guard_margin": 0.03
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "guard_0p05",
+      "overrides": {
+        "joint_limit_braking_guard_margin": 0.05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "guard_0p08",
+      "overrides": {
+        "joint_limit_braking_guard_margin": 0.08
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "guard_0p12",
+      "overrides": {
+        "joint_limit_braking_guard_margin": 0.12
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "reaction_0p08_buffer_0p03",
+      "overrides": {
+        "joint_limit_braking_reaction_time": 0.08,
+        "joint_limit_braking_distance_buffer": 0.03
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "reaction_0p12_buffer_0p05",
+      "overrides": {
+        "joint_limit_braking_reaction_time": 0.12,
+        "joint_limit_braking_distance_buffer": 0.05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "reaction_0p16_buffer_0p08",
+      "overrides": {
+        "joint_limit_braking_reaction_time": 0.16,
+        "joint_limit_braking_distance_buffer": 0.08
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "guard_0p05_reaction_0p08",
+      "overrides": {
+        "joint_limit_braking_guard_margin": 0.05,
+        "joint_limit_braking_reaction_time": 0.08
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "guard_0p08_reaction_0p12",
+      "overrides": {
+        "joint_limit_braking_guard_margin": 0.08,
+        "joint_limit_braking_reaction_time": 0.12
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "joint1_lower_v0p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 0.5,
+      "sample_count": 2304,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint1_lower_v1",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.0,
+      "sample_count": 1264,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint1_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 918,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint1_lower_v2",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 744,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint1_upper_v0p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 0.5,
+      "sample_count": 5446,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint1_upper_v1",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.0,
+      "sample_count": 2836,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint1_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1966,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint1_upper_v2",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 1530,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint2_lower_v1",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.0,
+      "sample_count": 686,
+      "description": "FK-generated path moving right J2 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint2_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 532,
+      "description": "FK-generated path moving right J2 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint2_lower_v2",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 456,
+      "description": "FK-generated path moving right J2 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint2_upper_v1",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.0,
+      "sample_count": 2368,
+      "description": "FK-generated path moving right J2 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint2_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1654,
+      "description": "FK-generated path moving right J2 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint2_upper_v2",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 1296,
+      "description": "FK-generated path moving right J2 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint4_lower_v1",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.0,
+      "sample_count": 1230,
+      "description": "FK-generated path moving right J4 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint4_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 894,
+      "description": "FK-generated path moving right J4 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint4_lower_v2",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 728,
+      "description": "FK-generated path moving right J4 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint4_upper_v1",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.0,
+      "sample_count": 1038,
+      "description": "FK-generated path moving right J4 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint4_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 766,
+      "description": "FK-generated path moving right J4 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint4_upper_v2",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 632,
+      "description": "FK-generated path moving right J4 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    }
+  ]
+}

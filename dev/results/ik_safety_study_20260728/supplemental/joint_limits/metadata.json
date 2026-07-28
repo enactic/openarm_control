@@ -1,0 +1,626 @@
+{
+  "revision": "b0765391420948f0e8ed026c6e30f0b77b5ea3ff",
+  "study_revision": "2fe7fc6508c01761",
+  "generated_at": "2026-07-29T01:07:21+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "current",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "current_no_braking",
+      "overrides": {
+        "joint_limit_braking": false
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "isolated_no_braking",
+      "overrides": {
+        "joint_limit_braking": false,
+        "nullspace_cost": 0.0,
+        "singularity_approach_limit": false,
+        "frame_position_error_limit": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "isolated_braking_0p1",
+      "overrides": {
+        "joint_limit_braking": true,
+        "joint_limit_braking_slowdown_distance": 0.1,
+        "nullspace_cost": 0.0,
+        "singularity_approach_limit": false,
+        "frame_position_error_limit": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "isolated_braking_0p2",
+      "overrides": {
+        "joint_limit_braking": true,
+        "joint_limit_braking_slowdown_distance": 0.2,
+        "nullspace_cost": 0.0,
+        "singularity_approach_limit": false,
+        "frame_position_error_limit": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "isolated_braking_0p35",
+      "overrides": {
+        "joint_limit_braking": true,
+        "joint_limit_braking_slowdown_distance": 0.35,
+        "nullspace_cost": 0.0,
+        "singularity_approach_limit": false,
+        "frame_position_error_limit": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "isolated_braking_0p5",
+      "overrides": {
+        "joint_limit_braking": true,
+        "joint_limit_braking_slowdown_distance": 0.5,
+        "nullspace_cost": 0.0,
+        "singularity_approach_limit": false,
+        "frame_position_error_limit": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "isolated_braking_0p7",
+      "overrides": {
+        "joint_limit_braking": true,
+        "joint_limit_braking_slowdown_distance": 0.7,
+        "nullspace_cost": 0.0,
+        "singularity_approach_limit": false,
+        "frame_position_error_limit": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable",
+      "error_schedule_override": "native",
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "braking_distances": null,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "joint1_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 918,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint1_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1966,
+      "description": "FK-generated path moving right J1 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint2_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 532,
+      "description": "FK-generated path moving right J2 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint2_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1654,
+      "description": "FK-generated path moving right J2 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint3_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1006,
+      "description": "FK-generated path moving right J3 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint3_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1006,
+      "description": "FK-generated path moving right J3 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint4_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 894,
+      "description": "FK-generated path moving right J4 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint4_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 766,
+      "description": "FK-generated path moving right J4 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint5_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1006,
+      "description": "FK-generated path moving right J5 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint5_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1006,
+      "description": "FK-generated path moving right J5 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint6_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 612,
+      "description": "FK-generated path moving right J6 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint6_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 612,
+      "description": "FK-generated path moving right J6 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint7_lower_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1006,
+      "description": "FK-generated path moving right J7 to 0.01 rad inside its lower physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint7_upper_v1p5",
+      "family": "joint_limit",
+      "mode": "right",
+      "speed": 1.5,
+      "sample_count": 1006,
+      "description": "FK-generated path moving right J7 to 0.01 rad inside its upper physical limit.",
+      "initial_right": [
+        0.0,
+        0.45,
+        0.0,
+        1.35,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    }
+  ]
+}

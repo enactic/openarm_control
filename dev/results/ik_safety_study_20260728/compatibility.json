@@ -1,0 +1,49 @@
+{
+  "openarm_mujoco_version": "2.0.1",
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "arm_origin_present": true,
+  "frame_validation": {
+    "origin_site_id": 0,
+    "origin_world_pose": [
+      0.1850000023841858,
+      0.0,
+      1.340000033378601,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "driver_state_shape": [
+      16
+    ],
+    "sides": {
+      "right": {
+        "compose_position_error_m": 0.0,
+        "compose_orientation_error_rad": 1.144391699630559e-16,
+        "roundtrip_position_error_m": 0.0,
+        "roundtrip_orientation_error_rad": 0.0
+      },
+      "left": {
+        "compose_position_error_m": 0.0,
+        "compose_orientation_error_rad": 5.551115123125783e-17,
+        "roundtrip_position_error_m": 0.0,
+        "roundtrip_orientation_error_rad": 0.0
+      }
+    }
+  },
+  "world_relative_solve": {
+    "max_joint_difference_rad": 1.9744038581848145e-07,
+    "rms_joint_difference_rad": 5.89860971545891e-08
+  },
+  "mode_without_energy": {
+    "kinetic_energy_cost": 0.0,
+    "right_max_difference_rad": 8.642673492431641e-07,
+    "left_max_difference_rad": 2.0936131477355957e-06
+  },
+  "mode_with_current_energy": {
+    "kinetic_energy_cost": 3e-05,
+    "right_max_difference_rad": 1.3150274753570557e-06,
+    "left_max_difference_rad": 1.043081283569336e-06
+  },
+  "passed": true
+}
