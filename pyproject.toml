@@ -20,8 +20,8 @@ build-backend = "setuptools.build_meta"
 name = "openarm_control"
 version = "0.1.0"
 description = "Kinematics and control utilities for OpenArm"
-authors = [{name = "Enactic, Inc."}]
-license = {text = "Apache-2.0"}
+authors = [{ name = "Enactic, Inc." }]
+license = { text = "Apache-2.0" }
 readme = "README.md"
 requires-python = ">=3.10"
 
@@ -34,21 +34,22 @@ dependencies = [
     "pyyaml",
 ]
 
+
 [project.urls]
 Changelog = "https://github.com/enactic/openarm_control/releases"
 Issues = "https://github.com/enactic/openarm_control/issues"
 Repository = "https://github.com/enactic/openarm_control.git"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.ruff.lint]
 extend-select = [
-  "D",   # pydocstyle
-  "UP",
+    "D",  # pydocstyle
+    "UP",
 ]
 
 [tool.ruff.lint.per-file-ignores]

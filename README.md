@@ -12,6 +12,10 @@ uv sync
 
 ### `Kinematics`
 
+Poses are `float32[7] = [px, py, pz, qw, qx, qy, qz]`, expressed in the
+scene's `arm_origin` site frame by default (`--origin-frame world` restores
+world-frame poses).
+
 ```python
 from openarm_control import Kinematics, IKParams, ArmSetup
 
