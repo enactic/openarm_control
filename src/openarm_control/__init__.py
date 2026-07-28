@@ -15,27 +15,37 @@
 """Kinematics and control utilities for OpenArm."""
 
 from .config import ArmSetup, register_common_args, setup_from_args
+from .error_limited_frame_task import (
+    ErrorLimitedFrameTask,
+    ErrorLimitedRelativeFrameTask,
+)
+from .joint_braking_limit import JointBrakingLimit
 from .kinematics import (
     IKParams,
     Kinematics,
-    register_ik_args,
     ik_params_from_args,
+    register_ik_args,
 )
-from .poses import read_ee_pose, pose_to_se3, se3_to_pose
+from .nullspace_posture_task import NullspacePostureTask
+from .poses import pose_to_se3, read_ee_pose, se3_to_pose
+from .recoverable_configuration_limit import RecoverableConfigurationLimit
+from .singularity_approach_limit import SingularityApproachLimit
 
 __all__ = [
-    # context
     "ArmSetup",
-    # high-level interface
-    "Kinematics",
+    "ErrorLimitedFrameTask",
+    "ErrorLimitedRelativeFrameTask",
     "IKParams",
-    # CLI helpers
+    "JointBrakingLimit",
+    "Kinematics",
+    "NullspacePostureTask",
+    "RecoverableConfigurationLimit",
+    "SingularityApproachLimit",
+    "ik_params_from_args",
+    "pose_to_se3",
+    "read_ee_pose",
     "register_common_args",
     "register_ik_args",
-    "setup_from_args",
-    "ik_params_from_args",
-    # pose utilities
-    "read_ee_pose",
-    "pose_to_se3",
     "se3_to_pose",
+    "setup_from_args",
 ]

@@ -44,8 +44,8 @@ _FRAME_OBJ = {
 
 # Per-arm-joint velocity caps in rad/s. Enabled via --limit-velocity.
 ARM_JOINT_VELOCITY_LIMITS_RAD_S: list[float] = [
-    1.57,  # joint1 DM 8009
-    1.57,  # joint2 DM 8009
+    2.0,  # joint1 DM 8009
+    2.0,  # joint2 DM 8009
     3.14,  # joint3 DM 4340
     3.14,  # joint4 DM 4340
     12.6,  # joint5 DM 4310
