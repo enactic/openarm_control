@@ -18,7 +18,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openarm_control"
-version = "0.1.0"
+version = "0.2.0"
 description = "Kinematics and control utilities for OpenArm"
 authors = [{ name = "Enactic, Inc." }]
 license = { text = "Apache-2.0" }
