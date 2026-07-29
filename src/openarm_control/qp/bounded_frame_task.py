@@ -86,6 +86,7 @@ class BoundedFrameTask(mink.Task):
         self._target_linear_speed_fast = float(target_linear_speed_fast)
         self._position_error_latch_threshold = float(position_error_latch_threshold)
         self._previous_target_position: np.ndarray | None = None
+        self._identity: np.ndarray | None = None
         self.limit_activation = 1.0
 
     def set_target(self, transform: mink.SE3) -> None:
@@ -180,8 +181,11 @@ class BoundedFrameTask(mink.Task):
             error[:3] += self.limit_activation * (limited_error[:3] - full_error[:3])
         if bound_orientation:
             error[3:] = limited_error[3:]
+        nv = configuration.model.nv
+        if self._identity is None or self._identity.shape != (nv, nv):
+            self._identity = np.eye(nv, dtype=np.float64)
         return self._assemble_qp(
             error,
             self.compute_jacobian(configuration),
-            configuration._eye_nv,
+            self._identity,
         )

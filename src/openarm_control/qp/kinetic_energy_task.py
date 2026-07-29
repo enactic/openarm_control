@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from typing import SupportsFloat
+
 import mink
 import mujoco
 import numpy as np
@@ -29,6 +31,12 @@ class KineticEnergyRegularizationTask(mink.KineticEnergyRegularizationTask):
     up-to-date inertia matrix through MuJoCo's current sparse-matrix API.
     """
 
+    def __init__(self, cost: SupportsFloat) -> None:
+        """Initialize the task and reusable objective buffers."""
+        super().__init__(cost)
+        self._inertia: np.ndarray | None = None
+        self._linear_term: np.ndarray | None = None
+
     def compute_qp_objective(
         self,
         configuration: mink.Configuration,
@@ -39,16 +47,20 @@ class KineticEnergyRegularizationTask(mink.KineticEnergyRegularizationTask):
 
         model = configuration.model
         data = configuration.data
+        if self._inertia is None or self._inertia.shape != (model.nv, model.nv):
+            self._inertia = np.empty((model.nv, model.nv), dtype=np.float64)
+            self._linear_term = np.zeros(model.nv, dtype=np.float64)
+
         mujoco.mj_makeM(model, data)
-        inertia = np.empty((model.nv, model.nv), dtype=np.float64)
         mujoco.mju_sym2dense(
-            inertia,
+            self._inertia,
             data.M,
             model.M_rownnz,
             model.M_rowadr,
             model.M_colind,
         )
+        assert self._linear_term is not None
         return mink.Objective(
-            H=self.cost * self.inv_dt_sq * inertia,
-            c=np.zeros(model.nv, dtype=np.float64),
+            H=self.cost * self.inv_dt_sq * self._inertia,
+            c=self._linear_term,
         )

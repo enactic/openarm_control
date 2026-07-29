@@ -120,6 +120,7 @@ class NullspacePostureTask(mink.Task):
             model,
             indices,
         )
+        self._identity = np.eye(model.nv, dtype=np.float64)
         self._previous_direction: np.ndarray | None = None
 
     def _compute_terms(
@@ -183,4 +184,4 @@ class NullspacePostureTask(mink.Task):
     def compute_qp_objective(self, configuration: mink.Configuration) -> mink.Objective:
         """Assemble both terms from one SVD so they use the same direction."""
         error, jacobian = self._compute_terms(configuration)
-        return self._assemble_qp(error, jacobian, configuration._eye_nv)
+        return self._assemble_qp(error, jacobian, self._identity)

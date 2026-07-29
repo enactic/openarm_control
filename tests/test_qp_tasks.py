@@ -101,7 +101,7 @@ class BoundedFrameTaskTest(unittest.TestCase):
         expected = task._assemble_qp(
             expected_error,
             task.compute_jacobian(configuration),
-            configuration._eye_nv,
+            np.eye(configuration.model.nv),
         )
         actual = task.compute_qp_objective(configuration)
         np.testing.assert_allclose(actual.H, expected.H)
