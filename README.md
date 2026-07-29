@@ -21,19 +21,20 @@ from openarm_control import Kinematics, IKParams, ArmSetup
 
 # FK only
 kin = Kinematics(setup)
-pose = kin.fk("right", joints)               # float32[7]
-pose_r, pose_l = kin.fk_bimanual(r, l)       # single mj_forward
+pose = kin.fk("right", joints)  # float32[7]
+pose_r, pose_l = kin.fk_bimanual(r, l)  # single mj_forward
 
 # IK
-kin = Kinematics(setup, IKParams(damping=0.25, posture_cost=0.01))
+kin = Kinematics(setup, IKParams())
 kin.set_target("right", pose_r)
 kin.set_target("left", pose_l)
-result = kin.solve()                         # float32[16] right[8]+left[8]
+result = kin.solve()  # float32[16] right[8]+left[8]
 ```
 
 ### `IKParams`
 
-Solver configuration passed to `Kinematics`. All fields have defaults.
+Solver configuration passed to `Kinematics`. Key fields are listed below; all
+fields have defaults.
 
 | Field | Default | Description |
 |---|---|---|
@@ -50,6 +51,7 @@ Solver configuration passed to `Kinematics`. All fields have defaults.
 | `frame_orientation_error_limit` | `0.25` | Total orientation-error request per outer IK solve |
 | `nullspace_cost` | `7.0` | Fixed-home nullspace posture cost |
 | `nullspace_return_rate` | `1.6` | Nullspace return rate in s⁻¹ |
+| `joint_braking` | `True` | Enable preventive braking when velocity limits are active |
 | `joint_braking_distance` | `0.2` | Joint-limit braking distance in radians |
 | `singularity_max_approach_rate` | `0.25` | Maximum singularity-ratio approach rate |
 | `kinetic_energy_cost` | `2e-5` | Kinetic-energy regularization cost |
@@ -59,6 +61,29 @@ Build from CLI args with `register_ik_args` + `ik_params_from_args`:
 ```bash
 python your_ik_node.py --tick-hz 250 --limit-velocity
 ```
+
+### IK safety behavior
+
+The default IK profile combines four independent mechanisms:
+
+- **Frame-error bounding** limits the Cartesian correction requested by one
+  outer solve while retaining the full target for subsequent cycles.
+- **Nullspace posture regulation** guides the redundant arm motion toward the
+  initial home posture without applying a full joint-space posture objective.
+- **Singularity approach limiting** slows only motion that moves the arm toward
+  a poorly conditioned configuration.
+- **Kinetic-energy regularization** provides a weak mass-matrix-based
+  tie-breaker between kinematically similar solutions. It is not inverse
+  dynamics or gravity compensation.
+
+The full-joint home `PostureTask` is a separate optional objective controlled by
+`posture_cost` and is disabled by default. Per-joint velocity limits are also
+opt-in: provide `velocity_limits` directly or use `--limit-velocity`.
+Preventive joint-limit braking is enabled with those velocity limits and can be
+disabled independently with `--no-joint-braking`.
+
+Set the corresponding frame-error limit, task cost, or singularity approach
+rate to zero to disable an individual mechanism.
 
 The remaining curve-shape and threshold parameters are regular `IKParams`
 fields but are intentionally not exposed as CLI flags. Call

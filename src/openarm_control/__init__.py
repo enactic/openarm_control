@@ -24,18 +24,14 @@ from .ik_params import (
 from .kinematics import Kinematics
 
 __all__ = [
-    # context
     "ArmSetup",
-    # high-level interface
-    "Kinematics",
     "IKParams",
-    # CLI helpers
+    "Kinematics",
+    "ik_params_from_args",
+    "pose_to_se3",
+    "read_ee_pose",
     "register_common_args",
     "register_ik_args",
-    "setup_from_args",
-    "ik_params_from_args",
-    # pose utilities
-    "read_ee_pose",
-    "pose_to_se3",
     "se3_to_pose",
+    "setup_from_args",
 ]

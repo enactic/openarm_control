@@ -159,11 +159,11 @@ class _IKSolver:
         self._config.update(q=setup.data.qpos.copy())
         mid_qpos = self._config.data.qpos.copy()
 
-        task_kwargs = dict(
-            position_cost=params.position_cost,
-            orientation_cost=params.orientation_cost,
-            lm_damping=params.lm_damping,
-        )
+        task_kwargs = {
+            "position_cost": params.position_cost,
+            "orientation_cost": params.orientation_cost,
+            "lm_damping": params.lm_damping,
+        }
         self._tasks: dict[
             str,
             mink.FrameTask | mink.RelativeFrameTask | BoundedFrameTask,
