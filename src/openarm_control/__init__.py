@@ -15,13 +15,13 @@
 """Kinematics and control utilities for OpenArm."""
 
 from .config import ArmSetup, register_common_args, setup_from_args
-from .kinematics import (
+from .geometry.poses import pose_to_se3, read_ee_pose, se3_to_pose
+from .ik_params import (
     IKParams,
-    Kinematics,
-    register_ik_args,
     ik_params_from_args,
+    register_ik_args,
 )
-from .poses import read_ee_pose, pose_to_se3, se3_to_pose
+from .kinematics import Kinematics
 
 __all__ = [
     # context

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Pose conversion utilities shared across FK, IK, and controller nodes.
+"""Pose geometry utilities shared across FK, IK, and controller nodes.
 
 Convention: float32[7] = [px, py, pz, qw, qx, qy, qz]. API-level poses are
 expressed relative to the setup's origin frame (see config.ArmSetup);

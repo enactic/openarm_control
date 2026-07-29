@@ -34,38 +34,29 @@ Usage:
 
 from __future__ import annotations
 
-import argparse
-import pathlib
-from dataclasses import dataclass
-
 import mink
 import mink.exceptions
 import mujoco
 import numpy as np
-import yaml
 
-from openarm_control.config import (
-    ARM_JOINT_VELOCITY_LIMITS_RAD_S,
-    ArmSetup,
-    frame_name,
+from openarm_control.config import ArmSetup, frame_name
+from openarm_control.geometry.poses import pose_to_se3
+from openarm_control.ik_params import (
+    IKParams,
+    validate_ik_params,
 )
-from openarm_control.poses import pose_to_se3
-
-
-@dataclass
-class IKParams:
-    """Configuration for the mink QP-based IK solver."""
-
-    position_cost: float = 1.0
-    orientation_cost: float = 1.0
-    lm_damping: float = 0.01
-    damping: float = 0.25
-    solver: str = "daqp"
-    posture_cost: float = 0.01
-    diag_reg: float = 0.0
-    dt: float = 0.1
-    max_iters: int = 5
-    velocity_limits: dict[str, float] | None = None
+from openarm_control.qp.arm_joint_limit import (
+    ArmConfigurationLimit,
+    ArmJointLimit,
+)
+from openarm_control.qp.bounded_frame_task import BoundedFrameTask
+from openarm_control.qp.kinetic_energy_task import (
+    KineticEnergyRegularizationTask,
+)
+from openarm_control.qp.nullspace_posture_task import NullspacePostureTask
+from openarm_control.qp.singularity_approach_limit import (
+    SingularityApproachLimit,
+)
 
 
 class Kinematics:
@@ -112,6 +103,17 @@ class Kinematics:
         """Sync IK internal config from float32[16] driver state (right[8]+left[8])."""
         self._require_ik().sync(values16)
 
+    def update_measured_state(
+        self,
+        qpos16: np.ndarray,
+    ) -> None:
+        """Update measured qpos used by state-aware limits."""
+        self._require_ik().update_measured_state(qpos16)
+
+    def clear_measured_state(self) -> None:
+        """Discard measured qpos from state-aware limits."""
+        self._require_ik().clear_measured_state()
+
     def ready(self) -> bool:
         """Return True once all active arms have received at least one target this cycle."""
         return self._require_ik().ready()
@@ -138,11 +140,19 @@ class _IKSolver:
     """mink QP-based differential IK. Managed by Kinematics; not public API."""
 
     def __init__(self, setup: ArmSetup, params: IKParams) -> None:
+        validate_ik_params(params)
+        self._setup = setup
         self._sides = setup.sides
         self._solver_name = params.solver
         self._posture_cost = params.posture_cost
         self._joint_resolver = setup.joint_resolver
-        self._dt = params.dt
+        arm_qpos_by_side = {
+            side: setup.joint_resolver.arm_qpos_indices(side) for side in setup.sides
+        }
+        self._arm_dofs_by_side = {
+            side: setup.joint_resolver.arm_dof_indices(side) for side in setup.sides
+        }
+        self._substep_dt = params.dt / params.max_iters
         self._max_iters = params.max_iters
 
         self._config = mink.Configuration(setup.model)
@@ -154,7 +164,10 @@ class _IKSolver:
             orientation_cost=params.orientation_cost,
             lm_damping=params.lm_damping,
         )
-        self._tasks: dict[str, mink.FrameTask | mink.RelativeFrameTask]
+        self._tasks: dict[
+            str,
+            mink.FrameTask | mink.RelativeFrameTask | BoundedFrameTask,
+        ]
         if setup.origin_id is not None:
             self._tasks = {
                 side: mink.RelativeFrameTask(
@@ -178,13 +191,39 @@ class _IKSolver:
                 for side in setup.sides
             }
 
-        active_qpos: set[int] = set(
-            setup.joint_resolver._right.arm_qpos.tolist()
-        ) | set(setup.joint_resolver._left.arm_qpos.tolist())
+        if (
+            params.frame_position_error_limit > 0.0
+            or params.frame_orientation_error_limit > 0.0
+        ):
+            bounded_tasks = {
+                side: BoundedFrameTask(
+                    task,
+                    position_error_limit=params.frame_position_error_limit,
+                    orientation_error_limit=params.frame_orientation_error_limit,
+                    control_dt=params.dt,
+                    substeps=params.max_iters,
+                    target_linear_speed_slow=params.target_linear_speed_slow,
+                    target_linear_speed_fast=params.target_linear_speed_fast,
+                    position_error_latch_threshold=(
+                        params.position_error_latch_threshold
+                    ),
+                )
+                for side, task in self._tasks.items()
+            }
+            for task in bounded_tasks.values():
+                task.set_limit_activation(0.0)
+            self._tasks = bounded_tasks
+
+        active_qpos = {
+            int(index) for side in setup.sides for index in arm_qpos_by_side[side]
+        }
+        active_dofs = {
+            int(index) for side in setup.sides for index in self._arm_dofs_by_side[side]
+        }
         freeze_dofs = [
-            int(setup.model.jnt_dofadr[j])
-            for j in range(setup.model.njnt)
-            if setup.model.jnt_qposadr[j] not in active_qpos
+            dof_index
+            for dof_index in range(setup.model.nv)
+            if dof_index not in active_dofs
         ]
         self._freeze_task: mink.DofFreezingTask | None = (
             mink.DofFreezingTask(model=setup.model, dof_indices=freeze_dofs)
@@ -192,32 +231,118 @@ class _IKSolver:
             else None
         )
 
-        self._limits = [mink.ConfigurationLimit(setup.model)]
-
+        self._joint_limit: ArmJointLimit | None = None
         if params.velocity_limits is not None:
-            self._limits.append(mink.VelocityLimit(setup.model, params.velocity_limits))
+            self._joint_limit = ArmJointLimit(
+                model=setup.model,
+                qpos_indices=active_qpos,
+                velocities=params.velocity_limits,
+                position_gain=params.joint_limit_gain,
+                braking_distance=(
+                    params.joint_braking_distance if params.joint_braking else None
+                ),
+                braking_exponent=params.joint_braking_exponent,
+                braking_distance_buffer=params.joint_braking_distance_buffer,
+            )
+            self._limits: list[mink.Limit] = [self._joint_limit]
+        else:
+            self._limits = [
+                ArmConfigurationLimit(
+                    setup.model,
+                    active_qpos,
+                    gain=params.joint_limit_gain,
+                )
+            ]
+
+        self._singularity_limits: dict[str, SingularityApproachLimit] = {}
+        if params.singularity_max_approach_rate > 0.0:
+            for side in setup.sides:
+                limit = SingularityApproachLimit(
+                    model=setup.model,
+                    frame_task=self._tasks[side],
+                    dof_indices=self._arm_dofs_by_side[side],
+                    characteristic_length=params.jacobian_characteristic_length,
+                    ratio_stop=params.singularity_ratio_stop,
+                    ratio_slow=params.singularity_ratio_slow,
+                    max_approach_rate=params.singularity_max_approach_rate,
+                    exponent=params.singularity_braking_exponent,
+                    gradient_epsilon=params.singularity_gradient_epsilon,
+                )
+                self._singularity_limits[side] = limit
+                self._limits.append(limit)
 
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
         self._posture_task.set_target(mid_qpos)
 
-        self._solver_params: dict = {"damping": params.damping}
-        if params.diag_reg > 0.0:
-            self._solver_params["diag_reg"] = params.diag_reg
+        self._nullspace_tasks: dict[str, NullspacePostureTask] = {}
+        if params.nullspace_cost > 0.0:
+            for side in setup.sides:
+                self._nullspace_tasks[side] = NullspacePostureTask(
+                    model=setup.model,
+                    frame_task=self._tasks[side],
+                    dof_indices=self._arm_dofs_by_side[side],
+                    home_qpos=mid_qpos,
+                    cost=params.nullspace_cost,
+                    dt=self._substep_dt,
+                    return_rate=params.nullspace_return_rate,
+                    max_speed=params.nullspace_max_speed,
+                    singularity_low=params.nullspace_ratio_low,
+                    singularity_high=params.nullspace_ratio_high,
+                    characteristic_length=params.jacobian_characteristic_length,
+                )
 
+        self._kinetic_energy_task: KineticEnergyRegularizationTask | None = None
+        if params.kinetic_energy_cost > 0.0:
+            self._kinetic_energy_task = KineticEnergyRegularizationTask(
+                cost=params.kinetic_energy_cost
+            )
+            self._kinetic_energy_task.set_dt(self._substep_dt)
+
+        self._damping = params.damping
         self._pending: set[str] = set(setup.sides)
         self._gripper = np.zeros(2, dtype=np.float32)
 
     def set_target(self, side: str, pose: np.ndarray) -> None:
-        self._tasks[side].set_target(pose_to_se3(pose))
+        target = np.asarray(pose, dtype=np.float64)
+        task = self._tasks[side]
+        transform = pose_to_se3(target)
+        if isinstance(task, BoundedFrameTask):
+            task.set_target_and_update_schedule(transform, self._config)
+        else:
+            task.set_target(transform)
         self._pending.discard(side)
 
     def sync(self, values16: np.ndarray) -> None:
+        values = np.asarray(values16, dtype=np.float64)
+        if values.shape != (16,) or not np.all(np.isfinite(values)):
+            raise ValueError("Bimanual driver qpos must be a finite shape-(16,) array.")
         qpos = self._config.data.qpos.copy()
-        self._joint_resolver.set_qpos(qpos, values16[:8], "right")
-        self._joint_resolver.set_qpos(qpos, values16[8:16], "left")
+        self._joint_resolver.set_qpos(qpos, values[:8], "right")
+        self._joint_resolver.set_qpos(qpos, values[8:16], "left")
         self._config.update(q=qpos)
-        self._gripper[0] = values16[7]
-        self._gripper[1] = values16[15]
+        # set_gripper() remains the sole gripper-command writer.
+
+    def update_measured_state(
+        self,
+        qpos16: np.ndarray,
+    ) -> None:
+        """Update measured state without changing the IK command configuration."""
+        measured_qpos = self._setup.driver_qpos_to_mujoco(
+            qpos16,
+            base_qpos=self._config.q,
+        )
+
+        if self._joint_limit is not None:
+            self._joint_limit.update_measured_state(measured_qpos)
+        for limit in self._singularity_limits.values():
+            limit.update_measured_configuration(measured_qpos)
+
+    def clear_measured_state(self) -> None:
+        """Clear measured state from every state-aware limit."""
+        if self._joint_limit is not None:
+            self._joint_limit.clear_measured_state()
+        for limit in self._singularity_limits.values():
+            limit.clear_measured_configuration()
 
     def ready(self) -> bool:
         return len(self._pending) == 0
@@ -226,40 +351,33 @@ class _IKSolver:
         tasks = list(self._tasks.values())
         if self._posture_cost > 0.0:
             tasks.append(self._posture_task)
+        tasks.extend(self._nullspace_tasks.values())
+        if self._kinetic_energy_task is not None:
+            tasks.append(self._kinetic_energy_task)
         constraints = [self._freeze_task] if self._freeze_task else []
+
+        q_before = self._config.data.qpos.copy()
+        for limit in self._singularity_limits.values():
+            limit.prepare(self._config)
+        self._pending = set(self._sides)
 
         for _ in range(self._max_iters):
             try:
                 vel = mink.solve_ik(
                     self._config,
                     tasks,
-                    self._dt,
+                    self._substep_dt,
                     self._solver_name,
                     limits=self._limits,
                     constraints=constraints,
                     safety_break=False,
-                    **self._solver_params,
+                    damping=self._damping,
                 )
             except mink.exceptions.NoSolutionFound:
-                try:
-                    vel = mink.solve_ik(
-                        self._config,
-                        tasks,
-                        self._dt,
-                        self._solver_name,
-                        limits=[],
-                        constraints=constraints,
-                        safety_break=False,
-                        **self._solver_params,
-                    )
-                except mink.exceptions.NoSolutionFound:
-                    print(
-                        "Warning: IK solver failed (constrained and unconstrained). Skipping step."
-                    )
-                    return None
-            self._config.integrate_inplace(vel, self._dt)
-
-        self._pending = set(self._sides)
+                self._config.update(q=q_before)
+                print("Warning: constrained IK solver failed. Skipping step.")
+                return None
+            self._config.integrate_inplace(vel, self._substep_dt)
 
         qpos = self._config.data.qpos
         right_joints, _ = self._joint_resolver.get_driver(qpos, "right")
@@ -274,141 +392,3 @@ class _IKSolver:
 
 def _frame_name(setup: ArmSetup, side: str) -> str:
     return frame_name(setup.model, setup.frame_ids[side], setup.frame_types[side])
-
-
-def _convert_velocity(
-    rad_per_sec: float,
-    dt: float,
-    max_iters: int,
-    tick_hz: float,
-) -> float:
-    if max_iters <= 0 or dt <= 0.0 or tick_hz <= 0.0:
-        raise ValueError("max_iters, dt, and tick_hz must all be positive.")
-    return rad_per_sec / (max_iters * dt * tick_hz)
-
-
-def _load_velocity_caps(config_path: pathlib.Path | None) -> list[float]:
-    """Return per-joint velocity caps in rad/s.
-
-    With no config path, returns the built-in ARM_JOINT_VELOCITY_LIMITS_RAD_S. When a
-    path is given, reads the top-level 'arm_velocity_limits' list from the YAML and uses
-    it instead; the library stays config-format-agnostic beyond that single key.
-    """
-    if config_path is None:
-        return ARM_JOINT_VELOCITY_LIMITS_RAD_S
-
-    with open(config_path, encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-    if not isinstance(data, dict) or "arm_velocity_limits" not in data:
-        raise ValueError(
-            f"Config file {config_path} has no top-level 'arm_velocity_limits' list."
-        )
-
-    caps = [float(v) for v in data["arm_velocity_limits"]]
-    expected = len(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
-    if len(caps) != expected:
-        raise ValueError(
-            f"arm_velocity_limits in {config_path} has {len(caps)} entries; "
-            f"expected {expected}."
-        )
-    return caps
-
-
-# ── CLI helpers ───────────────────────────────────────────────────────────────
-
-
-def register_ik_args(parser: argparse.ArgumentParser) -> None:
-    """Register IK-specific CLI flags. Call after register_common_args."""
-    parser.add_argument(
-        "--pos-cost", type=float, default=1.0, help="Position task cost (default: 1.0)"
-    )
-    parser.add_argument(
-        "--ori-cost",
-        type=float,
-        default=1.0,
-        help="Orientation task cost (default: 1.0)",
-    )
-    parser.add_argument(
-        "--lm-damping",
-        type=float,
-        default=0.01,
-        help="Per-task LM damping (default: 0.01)",
-    )
-    parser.add_argument(
-        "--damping",
-        type=float,
-        default=0.25,
-        help="Global Tikhonov regularization (default: 0.25)",
-    )
-    parser.add_argument("--solver", default="daqp", help="QP backend (default: daqp)")
-    parser.add_argument(
-        "--max-iters", type=int, default=5, help="IK iterations per event (default: 5)"
-    )
-    parser.add_argument(
-        "--dt",
-        type=float,
-        default=0.1,
-        help="Integration timestep per iteration (default: 0.1)",
-    )
-    parser.add_argument(
-        "--posture-cost",
-        type=float,
-        default=0.01,
-        help="Posture task weight, 0=disabled (default: 0.01)",
-    )
-    parser.add_argument(
-        "--diag-reg",
-        type=float,
-        default=0.0,
-        help="QP diagonal regularization (default: 0.0)",
-    )
-    parser.add_argument(
-        "--limit-velocity",
-        action="store_true",
-        help="Enable per-joint velocity limits (caps in config.ARM_JOINT_VELOCITY_LIMITS_RAD_S).",
-    )
-    parser.add_argument(
-        "--config",
-        type=pathlib.Path,
-        default=None,
-        help=(
-            "YAML file with a top-level 'arm_velocity_limits: [rad/s, ...]' list that "
-            "overrides the built-in per-joint caps. Used only with --limit-velocity."
-        ),
-    )
-    parser.add_argument(
-        "--tick-hz",
-        type=float,
-        default=500.0,
-        help="Dora tick rate in Hz; must match the dataflow timer (default: 500.0).",
-    )
-
-
-def ik_params_from_args(args: argparse.Namespace) -> IKParams:
-    """Build IKParams from parsed args (requires register_ik_args to have been called)."""
-    velocity_limits: dict[str, float] | None = None
-    if args.limit_velocity:
-        caps = _load_velocity_caps(getattr(args, "config", None))
-        velocity_limits = {
-            f"openarm_{side}_joint{i + 1}": _convert_velocity(
-                rad_per_sec=v,
-                dt=args.dt,
-                max_iters=args.max_iters,
-                tick_hz=args.tick_hz,
-            )
-            for side in ("left", "right")
-            for i, v in enumerate(caps)
-        }
-
-    return IKParams(
-        position_cost=args.pos_cost,
-        orientation_cost=args.ori_cost,
-        lm_damping=args.lm_damping,
-        damping=args.damping,
-        solver=args.solver,
-        posture_cost=args.posture_cost,
-        diag_reg=args.diag_reg,
-        dt=args.dt,
-        max_iters=args.max_iters,
-        velocity_limits=velocity_limits,
-    )
