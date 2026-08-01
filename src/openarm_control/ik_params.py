@@ -40,7 +40,7 @@ class IKParams:
     max_iters: int = 5
     velocity_limits: dict[str, float] | None = None
 
-    frame_position_error_limit: float = 0.015
+    frame_position_error_limit: float = 0.02
     frame_orientation_error_limit: float = 0.25
     target_linear_speed_slow: float = 0.6
     target_linear_speed_fast: float = 0.9
@@ -53,7 +53,7 @@ class IKParams:
     joint_braking_distance_buffer: float = 0.01
 
     jacobian_characteristic_length: float = 0.3
-    nullspace_cost: float = 7.0
+    nullspace_cost: float = 8.5
     nullspace_return_rate: float = 1.6
     nullspace_max_speed: float = 1.0
     nullspace_ratio_low: float = 0.02

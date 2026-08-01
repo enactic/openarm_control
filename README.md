@@ -47,9 +47,9 @@ fields have defaults.
 | `dt` | `0.004` | Outer control period, divided across IK iterations |
 | `max_iters` | `5` | IK sub-iterations per solve |
 | `velocity_limits` | `None` | Per-joint velocity limits (applied in rad/s from `config.py`); `None` = disabled |
-| `frame_position_error_limit` | `0.015` | Total position-error request per outer IK solve |
+| `frame_position_error_limit` | `0.02` | Total position-error request per outer IK solve |
 | `frame_orientation_error_limit` | `0.25` | Total orientation-error request per outer IK solve |
-| `nullspace_cost` | `7.0` | Fixed-home nullspace posture cost |
+| `nullspace_cost` | `8.5` | Fixed-home nullspace posture cost |
 | `nullspace_return_rate` | `1.6` | Nullspace return rate in s⁻¹ |
 | `joint_braking` | `True` | Enable preventive braking when velocity limits are active |
 | `joint_braking_distance` | `0.2` | Joint-limit braking distance in radians |
