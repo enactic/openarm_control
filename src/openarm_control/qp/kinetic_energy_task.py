@@ -24,11 +24,11 @@ import numpy as np
 
 
 class KineticEnergyRegularizationTask(mink.KineticEnergyRegularizationTask):
-    """Use Mink's energy objective with MuJoCo's current inertia API.
+    """Use Mink's energy objective across MuJoCo inertia APIs.
 
     Mink 1.1.0 calls the pre-MuJoCo-3.10 ``mj_fullM`` signature. This override
-    keeps Mink's public task API and exact objective while obtaining an
-    up-to-date inertia matrix through MuJoCo's current sparse-matrix API.
+    keeps Mink's public task API and exact objective while supporting both that
+    signature and MuJoCo's newer sparse-matrix API.
     """
 
     def __init__(self, cost: SupportsFloat) -> None:
@@ -52,13 +52,16 @@ class KineticEnergyRegularizationTask(mink.KineticEnergyRegularizationTask):
             self._linear_term = np.zeros(model.nv, dtype=np.float64)
 
         mujoco.mj_makeM(model, data)
-        mujoco.mju_sym2dense(
-            self._inertia,
-            data.M,
-            model.M_rownnz,
-            model.M_rowadr,
-            model.M_colind,
-        )
+        if hasattr(mujoco, "mju_sym2dense"):
+            mujoco.mju_sym2dense(
+                self._inertia,
+                data.M,
+                model.M_rownnz,
+                model.M_rowadr,
+                model.M_colind,
+            )
+        else:
+            mujoco.mj_fullM(model, self._inertia, data.qM)
         assert self._linear_term is not None
         return mink.Objective(
             H=self.cost * self.inv_dt_sq * self._inertia,
