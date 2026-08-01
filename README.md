@@ -46,7 +46,7 @@ fields have defaults.
 | `posture_cost` | `0.0` | Full home posture task weight (0 = disabled) |
 | `dt` | `0.004` | Outer control period, divided across IK iterations |
 | `max_iters` | `5` | IK sub-iterations per solve |
-| `velocity_limits` | `None` | Per-joint velocity limits (applied in rad/s from `config.py`); `None` = disabled |
+| `velocity_limits` | `None` | Joint-name to velocity-cap mapping in rad/s; `None` keeps position-only limits |
 | `frame_position_error_limit` | `0.02` | Total position-error request per outer IK solve |
 | `frame_orientation_error_limit` | `0.25` | Total orientation-error request per outer IK solve |
 | `nullspace_cost` | `8.5` | Fixed-home nullspace posture cost |
@@ -62,12 +62,27 @@ Build from CLI args with `register_ik_args` + `ik_params_from_args`:
 python your_ik_node.py --tick-hz 250 --limit-velocity
 ```
 
-### IK safety behavior
+Without `--config`, `--limit-velocity` uses the built-in per-arm caps
+`[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s`. An optional YAML override uses a
+seven-entry `arm_velocity_limits` list:
 
-The default IK profile combines four independent mechanisms:
+```yaml
+arm_velocity_limits: [2.0, 2.0, 3.14, 3.14, 6.3, 6.3, 6.3]
+```
+
+```bash
+python your_ik_node.py --limit-velocity --config ./ik_limits.yaml
+```
+
+### Constrained IK behavior
+
+A bare `IKParams()` instance enables four complementary mechanisms:
 
 - **Frame-error bounding** limits the Cartesian correction requested by one
-  outer solve while retaining the full target for subsequent cycles.
+  outer solve while retaining the full target for subsequent cycles. Position
+  bounding activates smoothly with target linear speed and remains latched
+  while accumulated position lag is significant; orientation bounding is
+  always active when configured.
 - **Nullspace posture regulation** guides the redundant arm motion toward the
   initial home posture without applying a full joint-space posture objective.
 - **Singularity approach limiting** slows only motion that moves the arm toward
@@ -76,14 +91,28 @@ The default IK profile combines four independent mechanisms:
   tie-breaker between kinematically similar solutions. It is not inverse
   dynamics or gravity compensation.
 
-The full-joint home `PostureTask` is a separate optional objective controlled by
-`posture_cost` and is disabled by default. Per-joint velocity limits are also
-opt-in: provide `velocity_limits` directly or use `--limit-velocity`.
-Preventive joint-limit braking is enabled with those velocity limits and can be
-disabled independently with `--no-joint-braking`.
+Frame-error bounding limits accumulated feedback correction, not target
+velocity, and does not replace joint velocity limits. The full-joint home
+`PostureTask` is a separate optional objective controlled by `posture_cost` and
+is disabled by default.
 
-Set the corresponding frame-error limit, task cost, or singularity approach
-rate to zero to disable an individual mechanism.
+The bare library default leaves hardware-specific per-joint velocity limits
+opt-in: provide `velocity_limits` directly or use `--limit-velocity`. The CLI
+flag selects the built-in caps unless `--config` overrides them. Enabling these
+limits replaces the position-only arm limit with one recoverable
+position/velocity envelope, so a command already slightly outside a position
+bound can return over multiple feasible steps. Preventive braking then reduces
+only the velocity approaching a nearby position bound; it is enabled by default
+with velocity limits and can be disabled with `--no-joint-braking`.
+
+These limits constrain the QP solution. A downstream driver may apply its own
+independently configured execution-layer velocity envelope; the two sets of
+caps are not required to match.
+
+Set both frame-error limits to zero to remove frame-error bounding. Set
+`nullspace_cost`, `singularity_max_approach_rate`, or `kinetic_energy_cost` to
+zero to disable the corresponding mechanism. These are kinematic command-layer
+mechanisms, not a certified whole-robot safety controller.
 
 The remaining curve-shape and threshold parameters are regular `IKParams`
 fields but are intentionally not exposed as CLI flags. Call
