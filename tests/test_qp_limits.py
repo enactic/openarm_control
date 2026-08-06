@@ -33,7 +33,7 @@ from openarm_control.qp.bounded_frame_task import BoundedFrameTask
 from openarm_control.qp.singularity_approach_limit import (
     SingularityApproachLimit,
 )
-from tests._support import make_setup, velocity_mapping
+from _support import make_setup, velocity_mapping
 
 
 def _make_joint_limit(

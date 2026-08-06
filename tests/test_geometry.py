@@ -23,7 +23,7 @@ from openarm_control.geometry.jacobian import (
     normalized_arm_jacobian,
     relative_root_is_independent_of_dofs,
 )
-from tests._support import make_setup
+from _support import make_setup
 
 
 def test_relative_root_fast_path_matches_full_formula() -> None:

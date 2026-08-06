@@ -26,7 +26,7 @@ from openarm_control import (
     register_ik_args,
 )
 from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S
-from tests._support import make_setup
+from _support import make_setup
 
 
 def test_cli_resolves_tested_defaults() -> None:

@@ -26,7 +26,7 @@ import pytest
 from openarm_control import ArmSetup, IKParams, Kinematics
 from openarm_control.qp.arm_joint_limit import ArmJointLimit
 from openarm_control.qp.bounded_frame_task import BoundedFrameTask
-from tests._support import driver_state, make_setup, velocity_mapping
+from _support import driver_state, make_setup, velocity_mapping
 
 
 def test_driver_qpos_mapping_updates_only_active_arm() -> None:

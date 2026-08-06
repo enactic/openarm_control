@@ -31,7 +31,7 @@ from openarm_control.qp.nullspace_posture_task import (
     smoothstep_activation,
     structural_nullspace_direction,
 )
-from tests._support import make_setup
+from _support import make_setup
 
 
 def _make_task(
