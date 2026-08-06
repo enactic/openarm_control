@@ -27,10 +27,10 @@ requires-python = ">=3.10"
 
 dependencies = [
     "daqp==0.7.2",
-    "mink>=1.1.0",
+    "mink>=1.1.0,<1.2.0",
     "mujoco>=3.6.0",
     "numpy",
-    "openarm-mujoco",
+    "openarm-mujoco>=2.0.1",
     "pyyaml",
 ]
 
@@ -39,6 +39,11 @@ dependencies = [
 Changelog = "https://github.com/enactic/openarm_control/releases"
 Issues = "https://github.com/enactic/openarm_control/issues"
 Repository = "https://github.com/enactic/openarm_control.git"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.1.1",
+]
 
 [tool.setuptools]
 package-dir = { "" = "src" }

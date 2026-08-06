@@ -44,13 +44,13 @@ _FRAME_OBJ = {
 
 # Per-arm-joint velocity caps in rad/s. Enabled via --limit-velocity.
 ARM_JOINT_VELOCITY_LIMITS_RAD_S: list[float] = [
-    1.57,  # joint1 DM 8009
-    1.57,  # joint2 DM 8009
+    2.0,  # joint1 DM 8009
+    2.0,  # joint2 DM 8009
     3.14,  # joint3 DM 4340
     3.14,  # joint4 DM 4340
-    12.6,  # joint5 DM 4310
-    12.6,  # joint6 DM 4310
-    12.6,  # joint7 DM 4310
+    6.3,  # joint5 DM 4310
+    6.3,  # joint6 DM 4310
+    6.3,  # joint7 DM 4310
 ]
 
 
@@ -149,13 +149,40 @@ class ArmSetup:
         Expressed in the origin frame when one is set, else in world
         coordinates.
         """
-        from openarm_control.poses import read_ee_pose, relative_pose
+        from openarm_control.geometry.poses import read_ee_pose, relative_pose
 
         pose = read_ee_pose(self.data, self.frame_ids[side], self.frame_types[side])
         if self.origin_id is None:
             return pose
         origin = read_ee_pose(self.data, self.origin_id, self.origin_type)
         return relative_pose(origin, pose)
+
+    def driver_qpos_to_mujoco(
+        self,
+        qpos16: np.ndarray,
+        *,
+        base_qpos: np.ndarray,
+    ) -> np.ndarray:
+        """Map bimanual driver qpos into a full MuJoCo configuration."""
+        driver_qpos = np.asarray(qpos16, dtype=np.float64)
+        model_qpos = np.asarray(base_qpos, dtype=np.float64)
+        if driver_qpos.shape != (16,):
+            raise ValueError("Measured bimanual qpos must have shape (16,).")
+        if model_qpos.shape != (self.model.nq,):
+            raise ValueError(f"Base qpos must have shape ({self.model.nq},).")
+        if not np.all(np.isfinite(driver_qpos)) or not np.all(np.isfinite(model_qpos)):
+            raise ValueError("Measured driver qpos and base qpos must be finite.")
+
+        model_qpos = model_qpos.copy()
+        for side, offset in (("right", 0), ("left", 8)):
+            if side not in self.sides:
+                continue
+            self.joint_resolver.set_qpos(
+                model_qpos,
+                driver_qpos[offset : offset + 8],
+                side,
+            )
+        return model_qpos
 
 
 def _resolve_frame_id(model: mujoco.MjModel, name: str, ftype: str) -> int:

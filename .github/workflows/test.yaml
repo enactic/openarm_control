@@ -12,26 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Kinematics and control utilities for OpenArm."""
-
-from .config import ArmSetup, register_common_args, setup_from_args
-from .geometry.poses import pose_to_se3, read_ee_pose, se3_to_pose
-from .ik_params import (
-    IKParams,
-    ik_params_from_args,
-    register_ik_args,
-)
-from .kinematics import Kinematics
-
-__all__ = [
-    "ArmSetup",
-    "IKParams",
-    "Kinematics",
-    "ik_params_from_args",
-    "pose_to_se3",
-    "read_ee_pose",
-    "register_common_args",
-    "register_ik_args",
-    "se3_to_pose",
-    "setup_from_args",
-]
+name: Test
+on:
+  push:
+    branches-ignore:
+      - 'copilot/**'
+      - 'dependabot/**'
+    tags:
+      - '**'
+  pull_request:
+concurrency:
+  group: ${{ github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+jobs:
+  pytest:
+    name: pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+      - name: Sync environment
+        run: |
+          uv sync
+      - name: Run pytest
+        run: |
+          uv run pytest
