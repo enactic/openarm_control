@@ -164,6 +164,20 @@ class BoundedFrameTask(mink.Task):
         """Return the wrapped task Jacobian."""
         return self.frame_task.compute_jacobian(configuration)
 
+    def compute_qp_residual(
+        self,
+        configuration: mink.Configuration,
+    ) -> tuple[np.ndarray, np.ndarray, float] | None:
+        """Opt out of Mink's fused residual path so bounding is not bypassed.
+
+        Mink 1.2's solver prefers a task's residual and only falls back to
+        :meth:`compute_qp_objective` when it is ``None``. The inherited
+        ``mink.Task`` residual is built from :meth:`compute_error`, which
+        deliberately reports the *full* error, so accepting it would silently
+        drop the bounding this class exists to apply.
+        """
+        return None
+
     def compute_qp_objective(
         self,
         configuration: mink.Configuration,
