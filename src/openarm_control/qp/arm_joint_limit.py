@@ -23,6 +23,13 @@ import mujoco
 import numpy as np
 import numpy.typing as npt
 
+# MuJoCo 3.12 enums no longer compare equal to NumPy scalars, and tuple
+# membership compares element to needle, so keep joint-type checks int-to-int.
+SCALAR_JOINT_TYPES = (
+    int(mujoco.mjtJoint.mjJNT_HINGE),
+    int(mujoco.mjtJoint.mjJNT_SLIDE),
+)
+
 
 class ArmConfigurationLimit(mink.ConfigurationLimit):
     """Apply Mink's configuration limits only to selected scalar arm joints."""
@@ -44,10 +51,7 @@ class ArmConfigurationLimit(mink.ConfigurationLimit):
                 or int(model.jnt_qposadr[joint_id]) not in selected_qpos
             ):
                 continue
-            if model.jnt_type[joint_id] not in (
-                mujoco.mjtJoint.mjJNT_HINGE,
-                mujoco.mjtJoint.mjJNT_SLIDE,
-            ):
+            if int(model.jnt_type[joint_id]) not in SCALAR_JOINT_TYPES:
                 raise ValueError("ArmConfigurationLimit only supports scalar joints.")
             active_dofs.append(int(model.jnt_dofadr[joint_id]))
         self.indices = _readonly(active_dofs, dtype=int)
@@ -106,10 +110,7 @@ class ArmJointLimit(mink.Limit):
                     "its velocity limit will be skipped."
                 )
                 continue
-            if model.jnt_type[joint_id] not in (
-                mujoco.mjtJoint.mjJNT_HINGE,
-                mujoco.mjtJoint.mjJNT_SLIDE,
-            ):
+            if int(model.jnt_type[joint_id]) not in SCALAR_JOINT_TYPES:
                 raise ValueError("ArmJointLimit only supports scalar joints.")
 
             if name is None or name not in velocities:

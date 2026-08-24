@@ -26,6 +26,7 @@ import pytest
 
 from openarm_control import ArmSetup, pose_to_se3
 from openarm_control.qp.arm_joint_limit import (
+    SCALAR_JOINT_TYPES,
     ArmConfigurationLimit,
     ArmJointLimit,
 )
@@ -235,3 +236,21 @@ def test_target_does_not_change_geometric_ratio() -> None:
 
     np.testing.assert_allclose(shifted.G, initial.G, atol=1e-12)
     np.testing.assert_allclose(shifted.h, initial.h, atol=1e-12)
+
+
+def test_scalar_joint_types_do_not_rely_on_mujoco_enum_equality() -> None:
+    setup = make_setup("right")
+    selected_qpos = {
+        int(index) for index in setup.joint_resolver.arm_qpos_indices("right")
+    }
+    selected_types = [
+        setup.model.jnt_type[joint_id]
+        for joint_id in range(setup.model.njnt)
+        if int(setup.model.jnt_qposadr[joint_id]) in selected_qpos
+    ]
+    assert selected_types
+
+    assert all(isinstance(joint_type, int) for joint_type in SCALAR_JOINT_TYPES)
+    for joint_type in selected_types:
+        assert int(joint_type) in SCALAR_JOINT_TYPES
+    assert int(mujoco.mjtJoint.mjJNT_FREE) not in SCALAR_JOINT_TYPES
