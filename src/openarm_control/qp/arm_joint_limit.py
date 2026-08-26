@@ -44,9 +44,9 @@ class ArmConfigurationLimit(mink.ConfigurationLimit):
                 or int(model.jnt_qposadr[joint_id]) not in selected_qpos
             ):
                 continue
-            if model.jnt_type[joint_id] not in (
-                mujoco.mjtJoint.mjJNT_HINGE,
-                mujoco.mjtJoint.mjJNT_SLIDE,
+            if int(model.jnt_type[joint_id]) not in (
+                int(mujoco.mjtJoint.mjJNT_HINGE),
+                int(mujoco.mjtJoint.mjJNT_SLIDE),
             ):
                 raise ValueError("ArmConfigurationLimit only supports scalar joints.")
             active_dofs.append(int(model.jnt_dofadr[joint_id]))
@@ -106,9 +106,9 @@ class ArmJointLimit(mink.Limit):
                     "its velocity limit will be skipped."
                 )
                 continue
-            if model.jnt_type[joint_id] not in (
-                mujoco.mjtJoint.mjJNT_HINGE,
-                mujoco.mjtJoint.mjJNT_SLIDE,
+            if int(model.jnt_type[joint_id]) not in (
+                int(mujoco.mjtJoint.mjJNT_HINGE),
+                int(mujoco.mjtJoint.mjJNT_SLIDE),
             ):
                 raise ValueError("ArmJointLimit only supports scalar joints.")
 
