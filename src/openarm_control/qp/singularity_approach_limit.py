@@ -22,6 +22,7 @@ import numpy as np
 import numpy.typing as npt
 
 from openarm_control.geometry.jacobian import (
+    frame_is_independent_of_dofs,
     normalized_arm_jacobian,
     relative_root_is_independent_of_dofs,
     singularity_ratio,
@@ -66,6 +67,11 @@ class SingularityApproachLimit(mink.Limit):
         self.model = model
         self.frame_task = frame_task
         self.dof_indices = indices.copy()
+        self._jacobian_columns = (
+            slice(int(indices[0]), int(indices[-1]) + 1)
+            if np.all(np.diff(indices) == 1)
+            else self.dof_indices
+        )
         self.characteristic_length = float(characteristic_length)
         self.ratio_stop = float(ratio_stop)
         self.ratio_slow = float(ratio_slow)
@@ -78,6 +84,20 @@ class SingularityApproachLimit(mink.Limit):
             indices,
         )
         self._scratch = mink.Configuration(model)
+        native_task = getattr(frame_task, "frame_task", frame_task)
+        self._frame_id = getattr(model, native_task.frame_type)(
+            native_task.frame_name
+        ).id
+        self._jacobian_func = {
+            "body": mujoco.mj_jacBody,
+            "site": mujoco.mj_jacSite,
+            "geom": mujoco.mj_jacGeom,
+        }[native_task.frame_type]
+        self._world_jacobian = np.empty((6, model.nv), dtype=np.float64)
+        self._tangent = np.zeros(model.nv, dtype=np.float64)
+        self._perturbed_q = np.empty(model.nq, dtype=np.float64)
+        self._perturbed_jacobians = np.empty((indices.size, 2, 6, indices.size))
+        self._gradient = np.empty(indices.size, dtype=np.float64)
         self._measured_qpos: np.ndarray | None = None
         self._G: np.ndarray | None = None
         self._allowed_rate = self.max_rate
@@ -95,12 +115,19 @@ class SingularityApproachLimit(mink.Limit):
         """Fall back to the command configuration singularity ratio."""
         self._measured_qpos = None
 
-    def prepare(self, configuration: mink.Configuration) -> None:
-        """Linearize rho(q) once for the next outer IK control step."""
-        command_ratio, _ = self._ratio(configuration)
+    def prepare(
+        self,
+        configuration: mink.Configuration,
+        *,
+        command_ratio: float | None = None,
+        gradient: np.ndarray | None = None,
+    ) -> None:
+        """Linearize rho(q) once, optionally reusing a paired gradient."""
+        if command_ratio is None:
+            command_ratio, _ = self._ratio(configuration)
         measured_ratio: float | None = None
         if self._measured_qpos is not None:
-            self._scratch.update(q=self._measured_qpos)
+            self._update_scratch(self._measured_qpos)
             measured_ratio, _ = self._ratio(self._scratch)
         effective_ratio = (
             command_ratio
@@ -112,11 +139,43 @@ class SingularityApproachLimit(mink.Limit):
         smoothstep = unit_margin * unit_margin * (3.0 - 2.0 * unit_margin)
         activation = float(smoothstep**self.exponent)
         self._allowed_rate = self.max_rate * activation
-        gradient = self._finite_difference_gradient(configuration)
+        if gradient is None:
+            gradient = self._finite_difference_gradient(configuration)
 
         G = np.zeros((1, self.model.nv), dtype=np.float64)
         G[0, self.dof_indices] = -gradient
         self._G = G
+
+    def can_share_perturbations(self, other: SingularityApproachLimit) -> bool:
+        """Check both frames and roots for cross-arm kinematic dependencies."""
+        if (
+            self.model is not other.model
+            or self.gradient_epsilon != other.gradient_epsilon
+            or np.intersect1d(self.dof_indices, other.dof_indices).size
+        ):
+            return False
+        for limit, other_dofs in (
+            (self, other.dof_indices),
+            (other, self.dof_indices),
+        ):
+            task = getattr(limit.frame_task, "frame_task", limit.frame_task)
+            if not (
+                frame_is_independent_of_dofs(
+                    self.model, task.frame_name, task.frame_type, other_dofs
+                )
+                and relative_root_is_independent_of_dofs(
+                    limit.frame_task, self.model, other_dofs
+                )
+            ):
+                return False
+        return True
+
+    def _paired_gradients(
+        self, configuration: mink.Configuration, other: SingularityApproachLimit
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Compute a pair already validated by can_share_perturbations."""
+        gradient = self._finite_difference_gradient(configuration, paired_limit=other)
+        return gradient, other._gradient
 
     def compute_qp_inequalities(
         self,
@@ -135,6 +194,26 @@ class SingularityApproachLimit(mink.Limit):
         )
 
     def _ratio(self, configuration: mink.Configuration) -> tuple[float, np.ndarray]:
+        return singularity_ratio(self._jacobian(configuration))
+
+    def _jacobian(
+        self, configuration: mink.Configuration, *, out: np.ndarray | None = None
+    ) -> np.ndarray:
+        if self._root_is_independent_of_dofs:
+            jacobian = self._world_jacobian
+            self._jacobian_func(
+                self.model,
+                configuration.data,
+                jacobian[:3],
+                jacobian[3:],
+                self._frame_id,
+            )
+            # Pure frame rotation preserves singular values, also after length scaling.
+            if out is None:
+                out = np.empty((6, self.dof_indices.size), dtype=np.float64)
+            out[:] = jacobian[:, self._jacobian_columns]
+            out[:3] /= self.characteristic_length
+            return out
         jacobian = normalized_arm_jacobian(
             self.frame_task,
             configuration,
@@ -142,29 +221,69 @@ class SingularityApproachLimit(mink.Limit):
             self.characteristic_length,
             root_is_independent_of_dofs=self._root_is_independent_of_dofs,
         )
-        return singularity_ratio(jacobian)
+        if out is not None:
+            out[:] = jacobian
+            return out
+        return jacobian
 
     def _finite_difference_gradient(
         self,
         configuration: mink.Configuration,
+        *,
+        paired_limit: SingularityApproachLimit | None = None,
     ) -> np.ndarray:
-        q0 = configuration.q.copy()
-        tangent = np.zeros(self.model.nv, dtype=np.float64)
-        gradient = np.empty(self.dof_indices.size, dtype=np.float64)
+        q0 = configuration.q
+        tangent = self._tangent
+        tangent.fill(0.0)
+        q = self._perturbed_q
+        jacobians = self._perturbed_jacobians
         eps = self.gradient_epsilon
 
         for index, dof in enumerate(self.dof_indices):
             tangent[dof] = 1.0
-            q_plus = q0.copy()
-            mujoco.mj_integratePos(self.model, q_plus, tangent, eps)
-            self._scratch.update(q=q_plus)
-            ratio_plus, _ = self._ratio(self._scratch)
+            if paired_limit is not None:
+                tangent[paired_limit.dof_indices[index]] = 1.0
+            q[:] = q0
+            mujoco.mj_integratePos(self.model, q, tangent, eps)
+            self._update_scratch(q)
+            self._jacobian(self._scratch, out=jacobians[index, 0])
+            if paired_limit is not None:
+                paired_limit._jacobian(
+                    self._scratch, out=paired_limit._perturbed_jacobians[index, 0]
+                )
 
-            q_minus = q0.copy()
-            mujoco.mj_integratePos(self.model, q_minus, tangent, -eps)
-            self._scratch.update(q=q_minus)
-            ratio_minus, _ = self._ratio(self._scratch)
-            gradient[index] = (ratio_plus - ratio_minus) / (2.0 * eps)
+            q[:] = q0
+            mujoco.mj_integratePos(self.model, q, tangent, -eps)
+            self._update_scratch(q)
+            self._jacobian(self._scratch, out=jacobians[index, 1])
             tangent[dof] = 0.0
+            if paired_limit is not None:
+                paired_limit._jacobian(
+                    self._scratch, out=paired_limit._perturbed_jacobians[index, 1]
+                )
+                tangent[paired_limit.dof_indices[index]] = 0.0
 
+        gradient = self._gradient_from_samples()
+        if paired_limit is not None:
+            paired_limit._gradient_from_samples()
         return gradient
+
+    def _gradient_from_samples(self) -> np.ndarray:
+        # Batch the same positive/negative perturbations without changing the stencil.
+        singular_values = np.linalg.svd(self._perturbed_jacobians, compute_uv=False)
+        largest = singular_values[..., 0]
+        ratios = np.divide(
+            singular_values[..., -1],
+            largest,
+            out=np.zeros_like(largest),
+            where=largest > 0.0,
+        )
+        np.subtract(ratios[:, 0], ratios[:, 1], out=self._gradient)
+        self._gradient /= 2.0 * self.gradient_epsilon
+        return self._gradient
+
+    def _update_scratch(self, q: np.ndarray) -> None:
+        # Ratio evaluation only needs frame transforms and geometric Jacobians.
+        self._scratch.data.qpos[:] = q
+        mujoco.mj_kinematics(self.model, self._scratch.data)
+        mujoco.mj_comPos(self.model, self._scratch.data)

@@ -19,6 +19,7 @@ from __future__ import annotations
 from unittest import mock
 
 import mink
+import mujoco
 import numpy as np
 import openarm_mujoco.v2 as openarm_mujoco
 import pytest
@@ -27,6 +28,26 @@ from openarm_control import ArmSetup, IKParams, Kinematics
 from openarm_control.qp.arm_joint_limit import ArmJointLimit
 from openarm_control.qp.bounded_frame_task import BoundedFrameTask
 from _support import driver_state, make_setup, velocity_mapping
+
+
+@pytest.mark.parametrize("measured", (False, True))
+def test_solver_batches_svd_and_shares_perturbation_fk(measured: bool) -> None:
+    setup = make_setup(origin_frame="arm_origin")
+    params = IKParams(velocity_limits=velocity_mapping(*setup.sides))
+    kinematics = Kinematics(setup, params)
+    for side in setup.sides:
+        kinematics.set_target(side, setup.read_ee_pose(side))
+    if measured:
+        kinematics.update_measured_state(driver_state(setup))
+    with (
+        mock.patch.object(np.linalg, "svd", wraps=np.linalg.svd) as svd,
+        mock.patch.object(
+            mujoco, "mj_kinematics", wraps=mujoco.mj_kinematics
+        ) as forward,
+    ):
+        assert kinematics.solve() is not None
+    assert svd.call_count == params.max_iters + 2 + 2 * measured
+    assert forward.call_count == params.max_iters + 14 + 2 * measured
 
 
 def test_driver_qpos_mapping_updates_only_active_arm() -> None:

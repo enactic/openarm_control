@@ -16,12 +16,15 @@
 
 from __future__ import annotations
 
+import math
+
 import mink
 import mujoco
 import numpy as np
 import numpy.typing as npt
 
 from openarm_control.geometry.jacobian import (
+    CachedConfiguration,
     normalized_arm_jacobian,
     relative_root_is_independent_of_dofs,
 )
@@ -31,7 +34,8 @@ def smoothstep_activation(value: float, low: float, high: float) -> float:
     """Map ``value`` to [0, 1] with zero slope at both thresholds."""
     if not 0.0 <= low < high:
         raise ValueError("Expected 0 <= low < high.")
-    u = float(np.clip((value - low) / (high - low), 0.0, 1.0))
+    u = float((value - low) / (high - low))
+    u = 0.0 if u < 0.0 else 1.0 if u > 1.0 else u
     return u * u * (3.0 - 2.0 * u)
 
 
@@ -45,7 +49,11 @@ def structural_nullspace_direction(
         raise ValueError(f"Expected a 6x7 Jacobian, got {jacobian.shape}.")
 
     _, singular_values, vh = np.linalg.svd(jacobian, full_matrices=True)
-    direction = vh[-1].copy()
+    return _align_direction(vh[-1], previous), singular_values
+
+
+def _align_direction(direction: np.ndarray, previous: np.ndarray | None) -> np.ndarray:
+    direction = direction.copy()
     if previous is not None:
         previous = np.asarray(previous, dtype=np.float64)
         if previous.shape != (7,):
@@ -54,7 +62,7 @@ def structural_nullspace_direction(
             )
         if float(direction @ previous) < 0.0:
             direction = -direction
-    return direction, singular_values
+    return direction
 
 
 class NullspacePostureTask(mink.Task):
@@ -121,12 +129,52 @@ class NullspacePostureTask(mink.Task):
             indices,
         )
         self._identity = np.eye(model.nv, dtype=np.float64)
+        self._configuration_error = np.empty(model.nv, dtype=np.float64)
         self._previous_direction: np.ndarray | None = None
+        self._svd_partner: NullspacePostureTask | None = None
+        self._svd_batch: np.ndarray | None = None
 
-    def _compute_terms(
-        self, configuration: mink.Configuration
-    ) -> tuple[np.ndarray, np.ndarray]:
-        normalized_jacobian = normalized_arm_jacobian(
+    def _batch_svd_with(self, other: NullspacePostureTask) -> None:
+        """Let this task populate both spectra for a fixed pair in one batch."""
+        self._svd_partner = other
+        self._svd_batch = np.empty((2, 6, 7), dtype=np.float64)
+
+    def _svd(self, configuration: mink.Configuration) -> tuple[np.ndarray, np.ndarray]:
+        cache = (
+            configuration._arm_svds
+            if isinstance(configuration, CachedConfiguration)
+            else None
+        )
+        cached = cache.get(self) if cache is not None else None
+        if cached is not None:
+            return cached
+        if (
+            cache is not None
+            and self._svd_partner is not None
+            and self._svd_partner not in cache
+        ):
+            assert self._svd_batch is not None
+            tasks = (self, self._svd_partner)
+            for index, task in enumerate(tasks):
+                self._svd_batch[index] = task._jacobian(configuration)
+            _, singular_values, vh = np.linalg.svd(self._svd_batch, full_matrices=True)
+            singular_values.setflags(write=False)
+            vh.setflags(write=False)
+            for index, task in enumerate(tasks):
+                cache[task] = (singular_values[index], vh[index, -1])
+            return cache[self]
+        _, singular_values, vh = np.linalg.svd(
+            self._jacobian(configuration), full_matrices=True
+        )
+        direction = vh[-1]
+        singular_values.setflags(write=False)
+        direction.setflags(write=False)
+        if cache is not None:
+            cache[self] = (singular_values, direction)
+        return singular_values, direction
+
+    def _jacobian(self, configuration: mink.Configuration) -> np.ndarray:
+        return normalized_arm_jacobian(
             self._frame_task,
             configuration,
             self._dof_indices,
@@ -134,10 +182,18 @@ class NullspacePostureTask(mink.Task):
             root_is_independent_of_dofs=self._root_is_independent_of_dofs,
         )
 
-        direction, singular_values = structural_nullspace_direction(
-            normalized_jacobian, self._previous_direction
-        )
-        self._previous_direction = direction.copy()
+    def compute_singularity_ratio(self, configuration: mink.Configuration) -> float:
+        """Expose the shared spectrum without advancing direction-continuity state."""
+        singular_values, _ = self._svd(configuration)
+        largest = float(singular_values[0]) if singular_values.size else 0.0
+        return float(singular_values[-1] / largest) if largest > 0.0 else 0.0
+
+    def _compute_terms(
+        self, configuration: mink.Configuration
+    ) -> tuple[np.ndarray, np.ndarray]:
+        singular_values, direction = self._svd(configuration)
+        direction = _align_direction(direction, self._previous_direction)
+        self._previous_direction = direction
 
         largest = float(singular_values[0]) if singular_values.size else 0.0
         ratio = float(singular_values[-1] / largest) if largest > 0.0 else 0.0
@@ -145,25 +201,23 @@ class NullspacePostureTask(mink.Task):
             ratio, self._singularity_low, self._singularity_high
         )
 
-        configuration_error = np.empty(self._model.nv, dtype=np.float64)
+        configuration_error = self._configuration_error
         mujoco.mj_differentiatePos(
             m=self._model,
             qvel=configuration_error,
             dt=1.0,
             qpos1=self._home_qpos,
-            qpos2=configuration.q,
+            qpos2=configuration.data.qpos,
         )
         posture_error = float(direction @ configuration_error[self._dof_indices])
-        return_speed = float(
-            np.clip(
-                -self._return_rate * posture_error,
-                -self._max_speed,
-                self._max_speed,
-            )
-        )
+        return_speed = -self._return_rate * posture_error
+        if return_speed < -self._max_speed:
+            return_speed = -self._max_speed
+        elif return_speed > self._max_speed:
+            return_speed = self._max_speed
         displacement = return_speed * self._dt
 
-        effective_cost = float(np.sqrt(activation) * self._base_cost)
+        effective_cost = math.sqrt(activation) * self._base_cost
         self.cost[0] = effective_cost
         jacobian = np.zeros((1, self._model.nv), dtype=np.float64)
         jacobian[0, self._dof_indices] = direction
@@ -189,14 +243,7 @@ class NullspacePostureTask(mink.Task):
     def compute_qp_residual(
         self,
         configuration: mink.Configuration,
-    ) -> tuple[np.ndarray, np.ndarray, float] | None:
-        """Fall back to the single-pass objective assembly on Mink 1.2.
-
-        Mink 1.2's solver prefers a task's residual and only falls back to
-        :meth:`compute_qp_objective` when it is ``None``. The inherited
-        ``mink.Task`` residual calls :meth:`compute_error` and
-        :meth:`compute_jacobian` separately, causing each to compute the
-        normalized Jacobian and SVD. Returning ``None`` preserves this class's
-        one-SVD :meth:`compute_qp_objective` path.
-        """
-        return None
+    ) -> tuple[np.ndarray, np.ndarray, float]:
+        """Compute the fused residual from a single nullspace SVD."""
+        error, jacobian = self._compute_terms(configuration)
+        return self._weighted_residual(error, jacobian)

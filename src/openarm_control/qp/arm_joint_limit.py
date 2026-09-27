@@ -24,8 +24,8 @@ import numpy as np
 import numpy.typing as npt
 
 
-class ArmConfigurationLimit(mink.ConfigurationLimit):
-    """Apply Mink's configuration limits only to selected scalar arm joints."""
+class ArmConfigurationLimit(mink.Limit):
+    """Apply configuration limits only to selected scalar arm joints."""
 
     def __init__(
         self,
@@ -35,8 +35,14 @@ class ArmConfigurationLimit(mink.ConfigurationLimit):
         gain: float,
     ) -> None:
         """Build a configuration limit projected onto selected arm DoFs."""
-        super().__init__(model, gain=gain)
+        if not 0.0 < gain <= 1.0:
+            raise mink.exceptions.LimitDefinitionError(
+                f"{self.__class__.__name__} gain must be in the range (0, 1]"
+            )
+        self.model = model
+        self.gain = gain
         selected_qpos = {int(index) for index in qpos_indices}
+        active_joints: list[int] = []
         active_dofs: list[int] = []
         for joint_id in range(model.njnt):
             if (
@@ -49,12 +55,33 @@ class ArmConfigurationLimit(mink.ConfigurationLimit):
                 int(mujoco.mjtJoint.mjJNT_SLIDE),
             ):
                 raise ValueError("ArmConfigurationLimit only supports scalar joints.")
+            active_joints.append(joint_id)
             active_dofs.append(int(model.jnt_dofadr[joint_id]))
         self.indices = _readonly(active_dofs, dtype=int)
+        self.qpos_indices = _readonly(model.jnt_qposadr[active_joints], dtype=int)
+        self.lower = _readonly(model.jnt_range[active_joints, 0])
+        self.upper = _readonly(model.jnt_range[active_joints, 1])
         self.projection_matrix = (
             np.eye(model.nv, dtype=np.float64)[self.indices]
             if self.indices.size
             else None
+        )
+        self._G = (
+            np.vstack([self.projection_matrix, -self.projection_matrix])
+            if self.projection_matrix is not None
+            else None
+        )
+
+    def compute_qp_inequalities(
+        self, configuration: mink.Configuration, dt: float
+    ) -> mink.Constraint:
+        """Bound selected joint displacements without constraining scene joints."""
+        if self.projection_matrix is None:
+            return mink.Constraint()
+        q = configuration.data.qpos[self.qpos_indices]
+        return mink.Constraint(
+            G=self._G,
+            h=self.gain * np.hstack([self.upper - q, q - self.lower]),
         )
 
 
@@ -143,6 +170,11 @@ class ArmJointLimit(mink.Limit):
             if self.dof_indices.size
             else None
         )
+        self._G = (
+            np.vstack([self.projection_matrix, -self.projection_matrix])
+            if self.projection_matrix is not None
+            else None
+        )
         self._measured_qpos: np.ndarray | None = None
 
     def update_measured_state(self, qpos: npt.ArrayLike) -> None:
@@ -169,7 +201,7 @@ class ArmJointLimit(mink.Limit):
         if dt <= 0.0:
             raise ValueError("dt must be positive.")
 
-        command_q = configuration.q[self.qpos_indices]
+        command_q = configuration.data.qpos[self.qpos_indices]
         max_step = dt * self.max_velocity
         position_lower = self.position_gain * (self.lower - command_q)
         position_upper = self.position_gain * (self.upper - command_q)
@@ -205,7 +237,7 @@ class ArmJointLimit(mink.Limit):
             upper_step = np.minimum(upper_step, dt * upper_velocity)
 
         return mink.Constraint(
-            G=np.vstack([self.projection_matrix, -self.projection_matrix]),
+            G=self._G,
             h=np.hstack([upper_step, -lower_step]),
         )
 
