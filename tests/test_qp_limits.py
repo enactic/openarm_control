@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import contextlib
 import io
+import xml.etree.ElementTree as ET
+from unittest import mock
 
 import mink
 import mujoco
@@ -25,6 +27,10 @@ import numpy as np
 import pytest
 
 from openarm_control import ArmSetup, pose_to_se3
+from openarm_control.geometry.jacobian import (
+    normalized_arm_jacobian,
+    singularity_ratio,
+)
 from openarm_control.qp.arm_joint_limit import (
     ArmConfigurationLimit,
     ArmJointLimit,
@@ -62,6 +68,7 @@ def test_center_uses_physical_velocity_cap() -> None:
     configuration.update(q=q)
     constraint = limit.compute_qp_inequalities(configuration, dt=0.01)
     assert constraint.h is not None
+    assert constraint.G is limit.compute_qp_inequalities(configuration, dt=0.01).G
 
     assert constraint.h[row] == pytest.approx(limit.max_velocity[row] * 0.01)
     assert constraint.h[limit.indices.size + row] == pytest.approx(
@@ -69,19 +76,32 @@ def test_center_uses_physical_velocity_cap() -> None:
     )
 
 
-def test_configuration_limit_uses_selected_dofs_and_gain() -> None:
-    setup = make_setup("right")
-    limit = ArmConfigurationLimit(
-        setup.model,
-        setup.joint_resolver.arm_qpos_indices("right"),
-        gain=0.8,
-    )
+def test_configuration_limit_selects_scalar_joints_and_applies_gain() -> None:
+    model = mujoco.MjModel.from_xml_string("""
+        <mujoco><compiler angle="radian"/><worldbody>
+          <body><joint name="arm_a" range="-1 1"/>
+            <geom type="sphere" size="0.1" mass="1"/></body>
+          <body pos="1 0 0"><joint name="object" type="ball" range="0 0.2"/>
+            <geom type="sphere" size="0.1" mass="1"/></body>
+          <body pos="2 0 0"><joint name="arm_b" range="-2 2"/>
+            <geom type="sphere" size="0.1" mass="1"/></body>
+        </worldbody></mujoco>
+    """)
+    configuration = mink.Configuration(model)
+    configuration.update(q=np.array([0.25, np.cos(0.3), np.sin(0.3), 0, 0, -0.5]))
+    limit = ArmConfigurationLimit(model, [5, 0], gain=0.8)
+    constraint = limit.compute_qp_inequalities(configuration, dt=0.004)
 
+    np.testing.assert_array_equal(limit.indices, [0, 4])
+    np.testing.assert_array_equal(limit.qpos_indices, [0, 5])
     np.testing.assert_array_equal(
-        limit.indices,
-        setup.joint_resolver.arm_dof_indices("right"),
+        constraint.G,
+        [[1, 0, 0, 0, 0], [0, 0, 0, 0, 1], [-1, 0, 0, 0, 0], [0, 0, 0, 0, -1]],
     )
-    assert limit.gain == 0.8
+    np.testing.assert_allclose(constraint.h, [0.6, 2.0, 1.0, 1.2])
+    assert constraint.G is limit.compute_qp_inequalities(configuration, dt=0.004).G
+    empty = ArmConfigurationLimit(model, [], gain=0.8)
+    assert empty.compute_qp_inequalities(configuration, dt=0.004).inactive
 
 
 def test_half_braking_distance_allows_quarter_velocity() -> None:
@@ -158,16 +178,18 @@ def test_unlimited_selected_joint_prints_warning_and_is_skipped() -> None:
     assert skipped_qpos not in limit.qpos_indices
 
 
-def _make_singularity_limit() -> tuple[
-    ArmSetup, SingularityApproachLimit, mink.Configuration
-]:
+def _make_singularity_limit(
+    root: str | None = None,
+) -> tuple[ArmSetup, SingularityApproachLimit, mink.Configuration]:
     setup = make_setup("right")
     configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
-    task = mink.FrameTask(
-        "right_ee_control_point",
-        "site",
+    task_type = mink.FrameTask if root is None else mink.RelativeFrameTask
+    task = task_type(
+        frame_name="right_ee_control_point",
+        frame_type="site",
         position_cost=10.0,
         orientation_cost=1.0,
+        **({"root_name": root, "root_type": "body"} if root is not None else {}),
     )
     limit = SingularityApproachLimit(
         setup.model,
@@ -182,16 +204,79 @@ def _make_singularity_limit() -> tuple[
     return setup, limit, configuration
 
 
+def _scalar_singularity_gradient(
+    limit: SingularityApproachLimit, configuration: mink.Configuration
+) -> np.ndarray:
+    model = configuration.model
+    q0 = configuration.q
+    reference = mink.Configuration(model)
+    gradient = np.empty(limit.dof_indices.size)
+    tangent = np.zeros(model.nv)
+    for index, dof in enumerate(limit.dof_indices):
+        tangent[dof] = 1.0
+        ratios = []
+        for sign in (1.0, -1.0):
+            q = q0.copy()
+            mujoco.mj_integratePos(model, q, tangent, sign * limit.gradient_epsilon)
+            reference.update(q=q)
+            jacobian = normalized_arm_jacobian(
+                limit.frame_task,
+                reference,
+                limit.dof_indices,
+                limit.characteristic_length,
+            )
+            ratios.append(singularity_ratio(jacobian)[0])
+        gradient[index] = (ratios[0] - ratios[1]) / (2.0 * limit.gradient_epsilon)
+        tangent[dof] = 0.0
+    return gradient
+
+
 def test_only_approaching_gradient_component_is_bounded() -> None:
     _, limit, configuration = _make_singularity_limit()
+    gradient = _scalar_singularity_gradient(limit, configuration)
     limit.prepare(configuration)
     constraint = limit.compute_qp_inequalities(configuration, dt=0.004)
     assert constraint.G is not None
-    gradient = -constraint.G[0, limit.dof_indices]
     approach = np.zeros(configuration.model.nv)
     approach[limit.dof_indices] = -gradient
     assert float((constraint.G @ approach)[0]) > 0.0
     assert float((constraint.G @ (-approach))[0]) < 0.0
+
+
+@pytest.mark.parametrize("straight", (False, True))
+@pytest.mark.parametrize("root", (None, "world", "openarm_right_link4"))
+def test_batched_gradient_matches_scalar_differences(
+    straight: bool, root: str | None
+) -> None:
+    setup, limit, configuration = _make_singularity_limit(root)
+    q0 = configuration.q
+    if straight:
+        q0[setup.joint_resolver.arm_qpos_indices("right")] = 0.0
+    configuration.update(q=q0)
+    actual = limit._finite_difference_gradient(configuration).copy()
+    expected = _scalar_singularity_gradient(limit, configuration)
+    np.testing.assert_allclose(actual, expected, rtol=1e-10, atol=1e-11)
+    np.testing.assert_array_equal(configuration.q, q0)
+
+
+def test_scratch_update_preserves_measured_state_constraint() -> None:
+    setup, limit, configuration = _make_singularity_limit()
+    q = configuration.q
+    q[setup.joint_resolver.arm_qpos_indices("right")] += np.linspace(-0.1, 0.1, 7)
+    configuration.update(q=q)
+    limit.update_measured_configuration(setup.data.qpos)
+
+    with mock.patch.object(mujoco, "mj_makeConstraint") as make_constraint:
+        limit.prepare(configuration)
+    make_constraint.assert_not_called()
+    actual = limit.compute_qp_inequalities(configuration, dt=0.004)
+
+    with mock.patch.object(limit, "_update_scratch", limit._scratch.update):
+        limit.prepare(configuration)
+    reference = limit.compute_qp_inequalities(configuration, dt=0.004)
+    np.testing.assert_allclose(actual.G, reference.G, rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(actual.h, reference.h, rtol=1e-12, atol=1e-12)
+    np.testing.assert_array_equal(configuration.q, q)
 
 
 def test_target_does_not_change_geometric_ratio() -> None:
@@ -235,3 +320,117 @@ def test_target_does_not_change_geometric_ratio() -> None:
 
     np.testing.assert_allclose(shifted.G, initial.G, atol=1e-12)
     np.testing.assert_allclose(shifted.h, initial.h, atol=1e-12)
+
+
+@pytest.mark.parametrize("reverse", (False, True))
+def test_jacobian_out_preserves_values_and_owned_results(reverse: bool) -> None:
+    setup, limit, configuration = _make_singularity_limit()
+    indices = limit.dof_indices.copy()
+    if reverse:
+        indices = indices[::-1]
+    limit = SingularityApproachLimit(
+        setup.model,
+        limit.frame_task,
+        indices,
+        characteristic_length=0.3,
+        ratio_stop=0.02,
+        ratio_slow=0.08,
+        max_approach_rate=0.25,
+    )
+    owned = limit._jacobian(configuration)
+    saved = owned.copy()
+    indices[:] = 0
+    output = np.empty((6, 7))
+    assert limit._jacobian(configuration, out=output) is output
+    np.testing.assert_array_equal(output, owned)
+    assert not np.shares_memory(owned, limit._world_jacobian)
+    q = configuration.q
+    q[setup.joint_resolver.arm_qpos_indices("right")] += 0.1
+    configuration.update(q=q)
+    limit._jacobian(configuration, out=output)
+    np.testing.assert_array_equal(owned, saved)
+
+
+def _make_articulated_pair() -> tuple[
+    SingularityApproachLimit, SingularityApproachLimit, mink.Configuration
+]:
+    xml = ET.Element("mujoco")
+    yaw = ET.SubElement(ET.SubElement(xml, "worldbody"), "body")
+    ET.SubElement(yaw, "joint", name="yaw", axis="0 0 1")
+    ET.SubElement(yaw, "geom", type="sphere", size="0.02", mass="1")
+    base = ET.SubElement(yaw, "body")
+    ET.SubElement(base, "joint", name="pitch", axis="0 1 0")
+    ET.SubElement(base, "geom", type="sphere", size="0.02", mass="1")
+    ET.SubElement(base, "site", name="arm_origin")
+    for side, offset in (("right", "0 -0.2 0"), ("left", "0 0.2 0")):
+        body = ET.SubElement(base, "body", pos=offset)
+        for index in range(7):
+            body = ET.SubElement(
+                body, "body", name=f"{side}_link{index}", pos="0 0 0.1"
+            )
+            ET.SubElement(
+                body,
+                "joint",
+                name=f"{side}_joint{index}",
+                axis=("0 0 1", "0 1 0", "1 0 0")[index % 3],
+            )
+            ET.SubElement(body, "geom", type="sphere", size="0.02", mass="0.1")
+        ET.SubElement(body, "site", name=f"{side}_tip", pos="0 0 0.1")
+    model = mujoco.MjModel.from_xml_string(ET.tostring(xml, encoding="unicode"))
+    limits = []
+    for side in ("right", "left"):
+        task = mink.RelativeFrameTask(
+            frame_name=f"{side}_tip",
+            frame_type="site",
+            root_name="arm_origin",
+            root_type="site",
+            position_cost=1.0,
+            orientation_cost=1.0,
+        )
+        limits.append(
+            SingularityApproachLimit(
+                model,
+                task,
+                [model.joint(f"{side}_joint{i}").dofadr[0] for i in range(7)],
+                characteristic_length=0.3,
+                ratio_stop=0.02,
+                ratio_slow=0.08,
+                max_approach_rate=0.25,
+            )
+        )
+    return limits[0], limits[1], mink.Configuration(model)
+
+
+@pytest.mark.parametrize("base_angles", ((0.0, 0.0), (0.6, -0.4)))
+def test_paired_gradients_preserve_articulated_base(
+    base_angles: tuple[float, float],
+) -> None:
+    right, left, configuration = _make_articulated_pair()
+    q = np.linspace(-0.5, 0.6, configuration.model.nq)
+    q[:2] = base_angles
+    configuration.update(q=q)
+    expected = [
+        limit._finite_difference_gradient(configuration).copy()
+        for limit in (right, left)
+    ]
+
+    assert right.can_share_perturbations(left)
+    actual = right._paired_gradients(configuration, left)
+    np.testing.assert_allclose(actual, expected, rtol=1e-10, atol=1e-11)
+    np.testing.assert_array_equal(configuration.q, q)
+
+
+@pytest.mark.parametrize("change", ("frame", "root", "dof", "epsilon"))
+def test_pairing_rejects_cross_dependencies_or_different_steps(change: str) -> None:
+    right, left, _ = _make_articulated_pair()
+    if change == "frame":
+        left.frame_task.frame_name = "right_tip"
+    elif change == "root":
+        left.frame_task.root_name = "right_link3"
+        left.frame_task.root_type = "body"
+    elif change == "dof":
+        left.dof_indices[0] = right.dof_indices[0]
+    else:
+        left.gradient_epsilon *= 2.0
+    assert not right.can_share_perturbations(left)
+    assert not left.can_share_perturbations(right)

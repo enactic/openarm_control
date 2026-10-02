@@ -26,7 +26,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   pytest:
-    name: pytest
+    name: pytest (${{ matrix.mink }})
+    strategy:
+      matrix:
+        mink: ["mink==1.2.0", "mink"]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -37,6 +40,7 @@ jobs:
       - name: Sync environment
         run: |
           uv sync
+          uv pip install "${{ matrix.mink }}"
       - name: Run pytest
         run: |
-          uv run pytest
+          uv run --no-sync pytest

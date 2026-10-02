@@ -22,6 +22,32 @@ import numpy as np
 import numpy.typing as npt
 
 
+class CachedConfiguration(mink.Configuration):
+    """Cache read-only geometric quantities until the next configuration update."""
+
+    def __init__(self, model: mujoco.MjModel, q: np.ndarray | None = None) -> None:
+        """Initialize caches before Mink's constructor calls update."""
+        self._frame_jacobians: dict[tuple[str | int, str], np.ndarray] = {}
+        self._arm_svds: dict[mink.Task, tuple[np.ndarray, np.ndarray]] = {}
+        super().__init__(model, q=q)
+
+    def update(self, q: np.ndarray | None = None) -> None:
+        """Invalidate geometry whenever forward kinematics is updated."""
+        self._frame_jacobians.clear()
+        self._arm_svds.clear()
+        super().update(q=q)
+
+    def get_frame_jacobian(self, frame_name: str | int, frame_type: str) -> np.ndarray:
+        """Return a read-only body Jacobian shared by tasks at this configuration."""
+        key = (frame_name, frame_type)
+        jacobian = self._frame_jacobians.get(key)
+        if jacobian is None:
+            jacobian = super().get_frame_jacobian(frame_name, frame_type)
+            jacobian.setflags(write=False)
+            self._frame_jacobians[key] = jacobian
+        return jacobian
+
+
 def relative_root_is_independent_of_dofs(
     frame_task: mink.Task,
     model: mujoco.MjModel,
@@ -34,25 +60,39 @@ def relative_root_is_independent_of_dofs(
     if not isinstance(native_task, mink.RelativeFrameTask):
         raise TypeError("Expected a Mink frame task or a frame-task wrapper.")
 
-    root_id = mujoco.mj_name2id(
-        model,
-        {
-            "body": mujoco.mjtObj.mjOBJ_BODY,
-            "site": mujoco.mjtObj.mjOBJ_SITE,
-            "geom": mujoco.mjtObj.mjOBJ_GEOM,
-        }[native_task.root_type],
-        native_task.root_name,
+    return frame_is_independent_of_dofs(
+        model, native_task.root_name, native_task.root_type, dof_indices
     )
-    if root_id < 0:
-        raise ValueError(
-            f"Unknown {native_task.root_type} frame {native_task.root_name!r}."
+
+
+def frame_is_independent_of_dofs(
+    model: mujoco.MjModel,
+    frame_name: str | int,
+    frame_type: str,
+    dof_indices: npt.ArrayLike,
+) -> bool:
+    """Return whether none of the selected DoFs is an ancestor of the frame."""
+    frame_id = (
+        mujoco.mj_name2id(
+            model,
+            {
+                "body": mujoco.mjtObj.mjOBJ_BODY,
+                "site": mujoco.mjtObj.mjOBJ_SITE,
+                "geom": mujoco.mjtObj.mjOBJ_GEOM,
+            }[frame_type],
+            frame_name,
         )
-    if native_task.root_type == "body":
-        body_id = root_id
-    elif native_task.root_type == "site":
-        body_id = int(model.site_bodyid[root_id])
+        if isinstance(frame_name, str)
+        else int(frame_name)
+    )
+    if frame_id < 0:
+        raise ValueError(f"Unknown {frame_type} frame {frame_name!r}.")
+    if frame_type == "body":
+        body_id = frame_id
+    elif frame_type == "site":
+        body_id = int(model.site_bodyid[frame_id])
     else:
-        body_id = int(model.geom_bodyid[root_id])
+        body_id = int(model.geom_bodyid[frame_id])
 
     selected_dofs = set(np.asarray(dof_indices, dtype=int).tolist())
     while body_id > 0:

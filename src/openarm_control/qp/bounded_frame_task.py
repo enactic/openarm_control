@@ -143,16 +143,24 @@ class BoundedFrameTask(mink.Task):
         """Return one substep of the total position and orientation budgets."""
         return self._clip_error(self.compute_full_error(configuration))
 
-    def _clip_error(self, full_error: np.ndarray) -> np.ndarray:
+    def _clip_error(
+        self,
+        full_error: np.ndarray,
+        *,
+        position: bool = True,
+        orientation: bool = True,
+    ) -> np.ndarray:
         """Limit a previously computed frame error."""
         error = full_error.copy()
         for part, total_limit in (
-            (slice(0, 3), self.position_error_limit),
-            (slice(3, 6), self.orientation_error_limit),
+            (slice(0, 3), self.position_error_limit if position else 0.0),
+            (slice(3, 6), self.orientation_error_limit if orientation else 0.0),
         ):
             limit = total_limit / self._substeps
+            if limit <= 0.0:
+                continue
             norm = float(np.linalg.norm(error[part]))
-            if limit > 0.0 and norm > limit:
+            if norm > limit:
                 error[part] *= limit / norm
         return error
 
@@ -167,39 +175,45 @@ class BoundedFrameTask(mink.Task):
     def compute_qp_residual(
         self,
         configuration: mink.Configuration,
-    ) -> tuple[np.ndarray, np.ndarray, float] | None:
-        """Opt out of Mink's fused residual path so bounding is not bypassed.
+    ) -> tuple[np.ndarray, np.ndarray, float]:
+        """Return the bounded request for Mink's fused objective assembly."""
+        terms = self._bounded_terms(configuration)
+        if terms is None:
+            return self.frame_task.compute_qp_residual(configuration)
+        return self._weighted_residual(*terms)
 
-        Mink 1.2's solver prefers a task's residual and only falls back to
-        :meth:`compute_qp_objective` when it is ``None``. The inherited
-        ``mink.Task`` residual is built from :meth:`compute_error`, which
-        deliberately reports the *full* error, so accepting it would silently
-        drop the bounding this class exists to apply.
-        """
-        return None
+    def _bounded_terms(
+        self, configuration: mink.Configuration
+    ) -> tuple[np.ndarray, np.ndarray] | None:
+        bound_position = self.position_error_limit > 0.0 and self.limit_activation > 0.0
+        bound_orientation = self.orientation_error_limit > 0.0
+        if not bound_position and not bound_orientation:
+            return None
+
+        full_error, jacobian = self.frame_task._error_and_jacobian(configuration)
+        error = self._clip_error(
+            full_error, position=bound_position, orientation=bound_orientation
+        )
+        if bound_position:
+            error[:3] = full_error[:3] + self.limit_activation * (
+                error[:3] - full_error[:3]
+            )
+        return error, jacobian
 
     def compute_qp_objective(
         self,
         configuration: mink.Configuration,
     ) -> mink.Objective:
         """Modulate position by its schedule and always bound orientation."""
-        bound_position = self.position_error_limit > 0.0 and self.limit_activation > 0.0
-        bound_orientation = self.orientation_error_limit > 0.0
-        if not bound_position and not bound_orientation:
+        terms = self._bounded_terms(configuration)
+        if terms is None:
             return self.frame_task.compute_qp_objective(configuration)
-
-        full_error = self.compute_full_error(configuration)
-        limited_error = self._clip_error(full_error)
-        error = full_error.copy()
-        if bound_position:
-            error[:3] += self.limit_activation * (limited_error[:3] - full_error[:3])
-        if bound_orientation:
-            error[3:] = limited_error[3:]
+        error, jacobian = terms
         nv = configuration.model.nv
         if self._identity is None or self._identity.shape != (nv, nv):
             self._identity = np.eye(nv, dtype=np.float64)
         return self._assemble_qp(
             error,
-            self.compute_jacobian(configuration),
+            jacobian,
             self._identity,
         )

@@ -121,19 +121,86 @@ def test_orientation_limit_is_independent_of_position_activation() -> None:
     np.testing.assert_allclose(actual.c, expected.c)
 
 
-def test_objective_computes_native_error_once() -> None:
-    configuration, native, task, target = _make_task(orientation_error_limit=0.20)
-    target[:3] += [0.03, -0.02, 0.01]
-    task.set_target(pose_to_se3(target))
+def test_clipping_preserves_input_and_disabled_orientation() -> None:
+    _, _, task, _ = _make_task()
+    original = np.array([0.1, 0.0, 0.0, 0.2, 0.3, 0.4])
+    saved = original.copy()
+    clipped = task._clip_error(original)
+    assert not np.shares_memory(clipped, original)
+    np.testing.assert_array_equal(original, saved)
+    np.testing.assert_array_equal(clipped[3:], original[3:])
 
-    with mock.patch.object(
-        native,
-        "compute_error",
-        wraps=native.compute_error,
-    ) as compute_error:
-        task.compute_qp_objective(configuration)
 
-    compute_error.assert_called_once_with(configuration)
+@pytest.mark.parametrize("origin", ("world", "arm_origin"))
+@pytest.mark.parametrize(
+    "activation,orientation_limit", ((0.0, 0.0), (0.5, 0.2), (1.0, 0.2))
+)
+def test_fused_residuals_preserve_objective_without_repeated_terms(
+    origin: str, activation: float, orientation_limit: float
+) -> None:
+    setup = make_setup("right", origin_frame=origin)
+    solver = Kinematics(
+        setup, IKParams(nullspace_ratio_low=0.0, nullspace_ratio_high=1e-9)
+    )._ik
+    assert solver is not None
+    configuration = solver._config
+    q = configuration.q
+    q[setup.joint_resolver.arm_qpos_indices("right")] += 0.1
+    configuration.update(q=q)
+    frame = solver._tasks["right"]
+    assert isinstance(frame, BoundedFrameTask)
+    frame.orientation_error_limit = orientation_limit
+    frame.set_limit_activation(activation)
+    target = setup.read_ee_pose("right").astype(np.float64)
+    target[:3] += [0.04, -0.03, 0.02]
+    frame.set_target(pose_to_se3(target))
+    nullspace = solver._nullspace_tasks["right"]
+    tasks = [frame, nullspace, solver._kinetic_energy_task]
+    error = frame.compute_full_error(configuration)
+    limited = frame._clip_error(error)
+    error[:3] += activation * (limited[:3] - error[:3])
+    if orientation_limit > 0.0:
+        error[3:] = limited[3:]
+    expected = [
+        frame._assemble_qp(
+            error, frame.compute_jacobian(configuration), np.eye(configuration.nv)
+        ),
+        *[task.compute_qp_objective(configuration) for task in tasks[1:]],
+    ]
+
+    with (
+        mock.patch.object(
+            frame.frame_task,
+            "_error_and_jacobian",
+            wraps=frame.frame_task._error_and_jacobian,
+        ) as frame_terms,
+        mock.patch.object(
+            nullspace, "_compute_terms", wraps=nullspace._compute_terms
+        ) as terms,
+        mock.patch.object(
+            BoundedFrameTask,
+            "compute_qp_objective",
+            side_effect=AssertionError("Unexpected fallback"),
+        ),
+        mock.patch.object(
+            NullspacePostureTask,
+            "compute_qp_objective",
+            side_effect=AssertionError("Unexpected fallback"),
+        ),
+    ):
+        problem = mink.build_ik(configuration, tasks, 0.004, damping=0.1, limits=[])
+
+    frame_terms.assert_called_once_with(configuration)
+    terms.assert_called_once_with(configuration)
+    np.testing.assert_allclose(
+        problem.P,
+        sum(task.H for task in expected) + 0.1 * np.eye(configuration.nv),
+        rtol=1e-12,
+        atol=1e-12,
+    )
+    np.testing.assert_allclose(
+        problem.q, sum(task.c for task in expected), rtol=1e-12, atol=1e-12
+    )
 
 
 @pytest.mark.parametrize("substeps", (1, 5, 10))
@@ -220,9 +287,12 @@ def test_structural_direction_is_null_and_sign_continuous() -> None:
 
 
 def test_smooth_activation_has_flat_clamped_endpoints() -> None:
+    assert smoothstep_activation(-np.inf, 0.02, 0.05) == 0.0
     assert smoothstep_activation(0.02, 0.02, 0.05) == 0.0
     assert smoothstep_activation(0.035, 0.02, 0.05) == pytest.approx(0.5)
     assert smoothstep_activation(0.05, 0.02, 0.05) == 1.0
+    assert smoothstep_activation(np.inf, 0.02, 0.05) == 1.0
+    assert np.isnan(smoothstep_activation(np.nan, 0.02, 0.05))
 
 
 def test_task_is_nullspace_only_and_caps_return_speed() -> None:
@@ -289,3 +359,39 @@ def test_sync_does_not_move_home_reference() -> None:
     kinematics.sync(np.linspace(-0.2, 0.2, 16, dtype=np.float32))
     for side, task in solver._nullspace_tasks.items():
         np.testing.assert_array_equal(task._home_qpos, homes[side])
+
+
+@pytest.mark.parametrize("partner_first", (False, True))
+def test_batched_spectra_preserve_per_arm_results_and_cache(
+    partner_first: bool,
+) -> None:
+    setup = make_setup()
+    solver = Kinematics(setup, IKParams())._ik
+    configuration = solver._config
+    tasks = tuple(solver._nullspace_tasks.values())
+    expected = [
+        structural_nullspace_direction(task._jacobian(configuration)) for task in tasks
+    ]
+    order = tuple(reversed(tasks)) if partner_first else tasks
+    for task in order:
+        task._svd(configuration)
+    cached = [task._svd(configuration) for task in tasks]
+    saved = [(s.copy(), d.copy()) for s, d in cached]
+    for (spectrum, direction), (expected_direction, expected_spectrum) in zip(
+        cached, expected
+    ):
+        np.testing.assert_allclose(spectrum, expected_spectrum, atol=1e-12)
+        np.testing.assert_allclose(
+            np.outer(direction, direction),
+            np.outer(expected_direction, expected_direction),
+            atol=1e-12,
+        )
+        assert not spectrum.flags.writeable
+        assert not direction.flags.writeable
+    q = configuration.q
+    q[setup.joint_resolver.arm_qpos_indices("right")] += 0.1
+    configuration.update(q=q)
+    tasks[0]._svd(configuration)
+    for (spectrum, direction), (old_spectrum, old_direction) in zip(cached, saved):
+        np.testing.assert_array_equal(spectrum, old_spectrum)
+        np.testing.assert_array_equal(direction, old_direction)

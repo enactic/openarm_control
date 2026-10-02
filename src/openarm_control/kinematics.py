@@ -40,6 +40,7 @@ import mujoco
 import numpy as np
 
 from openarm_control.config import ArmSetup, frame_name
+from openarm_control.geometry.jacobian import CachedConfiguration
 from openarm_control.geometry.poses import pose_to_se3
 from openarm_control.ik_params import (
     IKParams,
@@ -155,7 +156,7 @@ class _IKSolver:
         self._substep_dt = params.dt / params.max_iters
         self._max_iters = params.max_iters
 
-        self._config = mink.Configuration(setup.model)
+        self._config = CachedConfiguration(setup.model)
         self._config.update(q=setup.data.qpos.copy())
         mid_qpos = self._config.data.qpos.copy()
 
@@ -271,6 +272,13 @@ class _IKSolver:
                 self._singularity_limits[side] = limit
                 self._limits.append(limit)
 
+        self._paired_singularity_limits: (
+            tuple[SingularityApproachLimit, SingularityApproachLimit] | None
+        ) = None
+        limits = tuple(self._singularity_limits.values())
+        if len(limits) == 2 and limits[0].can_share_perturbations(limits[1]):
+            self._paired_singularity_limits = (limits[0], limits[1])
+
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
         self._posture_task.set_target(mid_qpos)
 
@@ -290,6 +298,10 @@ class _IKSolver:
                     singularity_high=params.nullspace_ratio_high,
                     characteristic_length=params.jacobian_characteristic_length,
                 )
+
+        nullspace_tasks = tuple(self._nullspace_tasks.values())
+        if len(nullspace_tasks) == 2:
+            nullspace_tasks[0]._batch_svd_with(nullspace_tasks[1])
 
         self._kinetic_energy_task: KineticEnergyRegularizationTask | None = None
         if params.kinetic_energy_cost > 0.0:
@@ -357,8 +369,22 @@ class _IKSolver:
         constraints = [self._freeze_task] if self._freeze_task else []
 
         q_before = self._config.data.qpos.copy()
-        for limit in self._singularity_limits.values():
-            limit.prepare(self._config)
+        gradients: tuple[np.ndarray | None, ...] = (None,) * len(
+            self._singularity_limits
+        )
+        if self._paired_singularity_limits is not None:
+            first, second = self._paired_singularity_limits
+            gradients = first._paired_gradients(self._config, second)
+        for (side, limit), gradient in zip(
+            self._singularity_limits.items(), gradients, strict=True
+        ):
+            nullspace = self._nullspace_tasks.get(side)
+            command_ratio = (
+                nullspace.compute_singularity_ratio(self._config)
+                if nullspace is not None
+                else None
+            )
+            limit.prepare(self._config, command_ratio=command_ratio, gradient=gradient)
         self._pending = set(self._sides)
 
         for _ in range(self._max_iters):

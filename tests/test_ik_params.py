@@ -71,6 +71,7 @@ def test_unexposed_parameters_remain_regular_ik_fields() -> None:
     )
 
     assert "--ik-profile" not in options
+    assert "--diag-reg" not in options
     assert "--target-linear-speed-slow" not in options
     assert "--joint-braking-exponent" not in options
     assert "--singularity-ratio-stop" not in options
@@ -125,13 +126,6 @@ def test_control_overrides_and_velocity_yaml(tmp_path: pathlib.Path) -> None:
             assert (
                 params.velocity_limits[f"openarm_{side}_joint{index + 1}"] == expected
             )
-
-
-def test_diag_reg_is_not_a_registered_solver_option() -> None:
-    parser = argparse.ArgumentParser()
-    register_ik_args(parser)
-    options = {option for action in parser._actions for option in action.option_strings}
-    assert "--diag-reg" not in options
 
 
 def test_braking_can_be_disabled_without_disabling_velocity_limits() -> None:

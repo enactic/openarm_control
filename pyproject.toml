@@ -26,9 +26,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 
 dependencies = [
-    "daqp==0.7.2",
-    "mink>=1.1.0",
-    "mujoco>=3.6.0",
+    "daqp>=0.8.2",
+    "mink>=1.2.0",
+    "mujoco>=3.8.1",
     "numpy",
     "openarm-mujoco>=2.0.1",
     "pyyaml",

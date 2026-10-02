@@ -18,12 +18,51 @@ from __future__ import annotations
 
 import mink
 import numpy as np
+import pytest
 
+from openarm_control import IKParams, Kinematics
 from openarm_control.geometry.jacobian import (
     normalized_arm_jacobian,
     relative_root_is_independent_of_dofs,
 )
 from _support import make_setup
+
+
+@pytest.mark.parametrize("operation", ("update", "integrate"))
+def test_geometry_cache_is_read_only_and_invalidated(operation: str) -> None:
+    setup = make_setup("right")
+    solver = Kinematics(setup, IKParams())._ik
+    assert solver is not None
+    configuration = solver._config
+    task = solver._nullspace_tasks["right"]
+    frame_name, frame_type = "right_ee_control_point", "site"
+    dofs = setup.joint_resolver.arm_dof_indices("right")
+    jacobian = configuration.get_frame_jacobian(frame_name, frame_type)
+    assert configuration.get_frame_jacobian(frame_name, frame_type) is jacobian
+    spectrum, direction = task._svd(configuration)
+    solver._tasks["right"].set_target(mink.SE3.identity())
+    assert task._svd(configuration)[0] is spectrum
+    assert not jacobian.flags.writeable
+    assert not spectrum.flags.writeable
+    assert not direction.flags.writeable
+
+    if operation == "update":
+        q = configuration.q
+        q[setup.joint_resolver.arm_qpos_indices("right")[3]] += 0.1
+        configuration.update(q=q)
+    else:
+        velocity = np.zeros(setup.model.nv)
+        velocity[dofs[3]] = 0.1
+        configuration.integrate_inplace(velocity, dt=1.0)
+    new_jacobian = configuration.get_frame_jacobian(frame_name, frame_type)
+    new_spectrum, _ = task._svd(configuration)
+    assert new_jacobian is not jacobian
+    assert new_spectrum is not spectrum
+    reference = mink.Configuration(setup.model, q=configuration.q)
+    np.testing.assert_allclose(
+        new_jacobian, reference.get_frame_jacobian(frame_name, frame_type)
+    )
+    np.testing.assert_allclose(new_spectrum, task._svd(reference)[0])
 
 
 def test_relative_root_fast_path_matches_full_formula() -> None:
