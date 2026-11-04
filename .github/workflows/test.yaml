@@ -29,7 +29,10 @@ jobs:
     name: pytest (${{ matrix.mink }})
     strategy:
       matrix:
-        mink: ["mink==1.2.0", "mink"]
+        mink:
+          - "mink==1.2.0"
+          - "mink==1.3.0"
+          - "mink"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

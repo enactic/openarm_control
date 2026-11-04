@@ -128,7 +128,6 @@ class NullspacePostureTask(mink.Task):
             model,
             indices,
         )
-        self._identity = np.eye(model.nv, dtype=np.float64)
         self._configuration_error = np.empty(model.nv, dtype=np.float64)
         self._previous_direction: np.ndarray | None = None
         self._svd_partner: NullspacePostureTask | None = None
@@ -234,11 +233,6 @@ class NullspacePostureTask(mink.Task):
         """Return the nullspace-coordinate Jacobian."""
         _, jacobian = self._compute_terms(configuration)
         return jacobian
-
-    def compute_qp_objective(self, configuration: mink.Configuration) -> mink.Objective:
-        """Assemble both terms from one SVD so they use the same direction."""
-        error, jacobian = self._compute_terms(configuration)
-        return self._assemble_qp(error, jacobian, self._identity)
 
     def compute_qp_residual(
         self,

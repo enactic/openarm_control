@@ -34,6 +34,23 @@ from openarm_control.qp.nullspace_posture_task import (
 from _support import make_setup
 
 
+def _assert_residual_equal(
+    actual: tuple[np.ndarray, np.ndarray, float],
+    expected: tuple[np.ndarray, np.ndarray, float],
+) -> None:
+    for actual_part, expected_part in zip(actual, expected, strict=True):
+        np.testing.assert_array_equal(actual_part, expected_part)
+
+
+def _objective_from_residual(
+    residual: tuple[np.ndarray, np.ndarray, float], nv: int
+) -> mink.Objective:
+    weighted_jacobian, weighted_error, mu = residual
+    H = weighted_jacobian.T @ weighted_jacobian + mu * np.eye(nv)
+    c = -weighted_error @ weighted_jacobian
+    return mink.Objective(H, c)
+
+
 def _make_task(
     *,
     orientation_error_limit: float = 0.0,
@@ -80,17 +97,16 @@ def test_limits_request_but_preserves_full_error_and_target() -> None:
     assert native.transform_target_to_world is not None
 
 
-def test_zero_activation_is_exactly_the_native_objective() -> None:
+def test_zero_activation_is_exactly_the_native_residual() -> None:
     configuration, native, task, target = _make_task()
     target[:3] += [0.03, -0.02, 0.01]
     task.set_target(pose_to_se3(target))
     task.set_limit_activation(0.0)
 
-    native_objective = native.compute_qp_objective(configuration)
-    wrapped_objective = task.compute_qp_objective(configuration)
-
-    np.testing.assert_array_equal(wrapped_objective.H, native_objective.H)
-    np.testing.assert_array_equal(wrapped_objective.c, native_objective.c)
+    _assert_residual_equal(
+        task.compute_qp_residual(configuration),
+        native.compute_qp_residual(configuration),
+    )
 
 
 def test_orientation_limit_is_independent_of_position_activation() -> None:
@@ -109,16 +125,14 @@ def test_orientation_limit_is_independent_of_position_activation() -> None:
     assert float(np.linalg.norm(full_error[3:])) > 0.9
     assert float(np.linalg.norm(limited_error[3:])) == pytest.approx(0.20 / 5)
 
-    expected_error = full_error.copy()
-    expected_error[3:] = limited_error[3:]
-    expected = task._assemble_qp(
-        expected_error,
-        task.compute_jacobian(configuration),
-        np.eye(configuration.model.nv),
+    # Use the same native error path as the task: Mink 1.4.0's compute_error()
+    # and _error_and_jacobian() can differ in the last few bits.
+    expected_error, jacobian = task.frame_task._error_and_jacobian(configuration)
+    expected_error[3:] = task._clip_error(expected_error)[3:]
+    _assert_residual_equal(
+        task.compute_qp_residual(configuration),
+        task._weighted_residual(expected_error, jacobian),
     )
-    actual = task.compute_qp_objective(configuration)
-    np.testing.assert_allclose(actual.H, expected.H)
-    np.testing.assert_allclose(actual.c, expected.c)
 
 
 def test_clipping_preserves_input_and_disabled_orientation() -> None:
@@ -156,16 +170,21 @@ def test_fused_residuals_preserve_objective_without_repeated_terms(
     frame.set_target(pose_to_se3(target))
     nullspace = solver._nullspace_tasks["right"]
     tasks = [frame, nullspace, solver._kinetic_energy_task]
-    error = frame.compute_full_error(configuration)
+    # Use the same native error path as the task: Mink 1.4.0's compute_error()
+    # and _error_and_jacobian() can differ in the last few bits.
+    error, jacobian = frame.frame_task._error_and_jacobian(configuration)
     limited = frame._clip_error(error)
     error[:3] += activation * (limited[:3] - error[:3])
     if orientation_limit > 0.0:
         error[3:] = limited[3:]
     expected = [
-        frame._assemble_qp(
-            error, frame.compute_jacobian(configuration), np.eye(configuration.nv)
+        _objective_from_residual(
+            frame._weighted_residual(error, jacobian), configuration.nv
         ),
-        *[task.compute_qp_objective(configuration) for task in tasks[1:]],
+        _objective_from_residual(
+            nullspace.compute_qp_residual(configuration), configuration.nv
+        ),
+        solver._kinetic_energy_task.compute_qp_objective(configuration),
     ]
 
     with (
